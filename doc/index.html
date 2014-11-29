@@ -1,1 +1,44 @@
-test doc
+<!doctype html>
+<meta charset="utf-8"/>
+<link href="doc.css" rel="stylesheet"/>
+<script src="/1k.js"></script>
+<table class="wrap" cellspacing="0" cellpadding="0">
+    <tr>
+        <td id="sidebar"><h1><a href="">1K.JS</a></h1><ul><li class="mod"><h4>核心</h4><div><ul class="rootitem"><li idx="Class">Class</li><li idx="widget">widget</li></ul></div></li><li class="mod"><h4>DOM</h4><div><h5>查询</h5><ul class="item"><li idx="selector">selector</li><li idx="query">query</li><li idx="eq">eq</li><li idx="find">find</li><li idx="parent">parent</li><li idx="child">child</li><li idx="prev">prev</li><li idx="next">next</li><li idx="filter">filter</li></ul><h5>操作</h5><ul class="item"><li idx="elem">elem</li><li idx="append">append</li><li idx="insert">insert</li><li idx="remove">remove</li><li idx="clone">clone</li><li idx="replace">replace</li><li idx="each">each</li></ul><h5>样式</h5><ul class="item"><li idx="cls">cls</li><li idx="css">css</li><li idx="px">px</li><li idx="left">left</li><li idx="top">top</li><li idx="width">width</li><li idx="height">height</li><li idx="offset">offset</li><li idx="offsetLeft">offsetLeft</li><li idx="offsetTop">offsetTop</li><li idx="offsetWidth">offsetWidth</li><li idx="offsetHeight">offsetHeight</li><li idx="opacity">opacity</li><li idx="show">show</li><li idx="hide">hide</li></ul><h5>事件</h5><ul class="item"><li idx="Event">Event</li><li idx="ready">ready</li><li idx="on">on</li><li idx="un">un</li><li idx="click">click</li><li idx="hover">hover</li></ul><h5>其他</h5><ul class="item"><li idx="attr">attr</li><li idx="html">html</li><li idx="tag">tag</li><li idx="contains">contains</li><li idx="val">val</li></ul></div></li><li class="mod"><h4>浏览器</h4><div><ul class="rootitem"><li idx="browser">browser</li><li idx="isIE6">isIE6</li><li idx="cookie">cookie</li><li idx="scrollTop">scrollTop</li><li idx="scrollLeft">scrollLeft</li><li idx="scrollWidth">scrollWidth</li><li idx="scrollHeight">scrollHeight</li></ul></div></li><li class="mod"><h4>资源请求</h4><div><ul class="rootitem"><li idx="ajax">ajax</li><li idx="post">post</li><li idx="get">get</li><li idx="img">img</li><li idx="js">js</li><li idx="style">style</li></ul></div></li><li class="mod"><h4>其他方法</h4><div><ul class="rootitem"><li idx="type">type</li><li idx="isArray">isArray</li><li idx="isFunction">isFunction</li></ul></div></li><li class="mod"><h4>对象</h4><div><ul class="rootitem"><li idx="each">each</li><li idx="toJson">toJson</li><li idx="param">param</li><li idx="mix">mix</li></ul></div></li><li class="mod"><h4>字符串</h4><div><ul class="rootitem"><li idx="tirm">tirm</li><li idx="parseJson">parseJson</li><li idx="encodeURL">encodeURL</li><li idx="encodeHTML">encodeHTML</li><li idx="decodeHTML">decodeHTML</li></ul></div></li><li class="mod"><h4>内部组件</h4><div><ul class="rootitem"><li idx="Anim">Anim</li><li idx="Drag">Drag</li></ul></div></li></ul></td>
+        <td id="content"><iframe width="100%" src="about.html"></iframe></td>
+    </tr>
+</table>
+
+<script>
+var Z = $1k;
+var focusButton;
+var focusButton2;
+Z('#sidebar h4').click(function(){
+    if(focusButton && focusButton.elem != this.elem){
+        focusButton.next().cls('-show');   
+    }
+    this.next().cls('~show');
+    focusButton = this;
+});
+Z('#sidebar h5').click(function(){
+    if(focusButton2 && focusButton2.elem != this.elem){
+        focusButton2.next().cls('-show');
+    }
+    this.next().cls('~show');
+    focusButton2 = this;
+});
+var iframe = Z('iframe');
+//var iDoc = iframe.elem.contentWindow.document;
+Z('#sidebar').click(function(e){
+    var idx = Z(e.target).attr('idx');
+    if(idx){
+        iframe.attr('src', 'page/'+ idx +'.html');
+        Z.scrollTop(0, 300);
+    }
+
+});
+
+iframe.on('load', function(){
+    iframe.attr('height', Math.max(640, Z('body', iframe.elem.contentWindow.document).height()))
+});
+</script>

@@ -1,0 +1,7 @@
+<?
+Fs.writeText(
+    $mappath('/1k.js'),
+    $require('1k.js').code(),
+    65001
+);
+?>

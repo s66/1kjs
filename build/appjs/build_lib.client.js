@@ -31,7 +31,7 @@
 					
 					var jscode = getCodeByUse(API2Hash(useAPI));
 					var doc = open('', '_blank');
-					doc.document.write('<!doctype html><html><head><meta charset="utf-8"/><title>1k</title><script src="/js/1k.js"></'+'script><script src="/js/highlight.js?skin=default"></'+'script><script>$1k.highlight.init()</'+'script></head><body><textarea class="lang-js">'+ jscode +'</textarea></body></html>');
+					doc.document.write('<!doctype html><html><head><meta charset="utf-8"/><title>1k</title><script src="/1k.js"></'+'script><script src="/doc/highlight.js?skin=default"></'+'script><script>$1k.highlight.init()</'+'script></head><body><textarea class="lang-js">'+ jscode +'</textarea></body></html>');
 					doc.document.close();
 				});
 				

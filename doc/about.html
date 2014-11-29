@@ -1,0 +1,577 @@
+<!doctype html>
+<meta charset="utf-8"/>
+<style>
+html{overflow-y:scroll;}
+body,h1,h2,h3,h4,h5,h6,p,dl,dt,dd,ul,form,button,input,textarea{margin:0;padding:0;}
+body,button,input,select,textarea{font:12px/1.5 tahoma,arial,\5b8b\4f53,sans-serif;}
+h1,h2,h3,h4,h5,h6{font-size:100%;}
+em{font-style:normal;}
+ul{list-style:none;}
+a{text-decoration:none;}
+a:hover{text-decoration:underline;}
+img{border:0;vertical-align:top;}
+button,input,select,textarea{font-size:100%;}
+table{border-collapse:collapse;border-spacing:0;}
+.clearfix{*zoom:1;}
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+html{overflow:hidden;}
+body,ul{margin:0;padding:0;}
+ul{list-style:none;}
+
+#pkbox{font-size:14px;margin-bottom:8px}
+#pkbox ul{margin-left:1em;}
+#pkbox ul .item{background:#232529;border:1px solid #000;text-indent:6px;margin:2px;cursor:pointer;color:#ddd;_display:inline-block;}
+#pkbox ul .item:hover{background:#3e4043;color:#fed16a;}
+.ppapi{float:left;margin-right:16px;width:200px;border:1px solid #3C78B5;padding:4px;}
+.ppapi h3{text-indent:6px;}
+body {font-family:tahoma,arial,宋体,sans-serif!important;}
+.info{padding:1em;font-size:14px;background:#ddd;margin:16px 0;}
+h1{font-size:24px;margin-bottom:12px;}
+.doc{margin:40px;}
+</style>
+<body>
+    <div class="doc">
+        <p class="info">1kjs是一个简洁小巧，可自由定制的JS类库。</p>
+        <h1>1k类库打包</h1>
+        <div id="pkbox" class="clearfix">
+            <div class="ppapi">
+                <h3>类库未选API</h3>
+                <ul id="unuseapi"></ul>
+            </div>
+            <div class="ppapi">
+                <h3>类库已选API</h3>
+                <ul id="useapi"></ul>
+            </div>
+            <ul class="ppapi">
+                <li><button id="pkgall">选择全部</button></li>
+                <li><button id="clearall">清空选择</button></li>
+                <li><button id="pkgdiy">查看定制</button></li>
+            </ul>
+        </div>    
+    </div>
+<script src="/1k.js"></script>
+
+<script>
+    
+!function(J){
+	var Lib = function(){
+		var $each = J.each;
+		var header = "/*\r\n**  ==================================================\r\n**  1k.js v2.01\r\n**  功能：js类库\r\n**  示例：  \r\n    --------------------------------------------------\r\n\r\n        文档：http://lib.1kjs.com/doc/\r\n\r\n    --------------------------------------------------\r\n**  邮件：zjfeihu@126.com \r\n**  更新：2013/11/05\r\n**  类库地址：http://lib.1kjs.com/\r\n**  ==================================================\r\n**/\r\n";
+		var API = {
+Core: {
+    Class_s: function(prop, source){
+		return $Class.extend(prop, source);
+    },
+	widget_s: function(name, fn, source){
+        if(typeof fn == 'function'){
+            return $1k[name] = fn($1k);
+        }else if(typeof fn == 'object'){
+            return $1k[name] = $Class.extend(fn, source);
+        }
+	}
+},
+DOM: {
+    Query: {
+        query_s: '$query',
+		eq_p: function(i){
+			if(i < 0)i = this.elems.length + i;
+			return $1k(this.elems[i]);
+		},
+		find_p: function(selector){
+			return $1k(selector, this.elem);
+		},
+		parent_p: function(index){
+			return $1k($parent(this.elem, index));
+		},         
+		child_p: function(index){
+			return $1k($child(this.elem, index));
+		},
+		prev_p: function(){
+			return $1k($prev(this.elem));
+		},
+		next_p: function(){
+			return $1k($next(this.elem));
+		},
+        filter_p: function(fn){
+            if(this.elems){
+                var elems = [];
+                $each(this.elems, function(elem, i){
+                    var Zelem = $1k(elem);
+                    if(fn.call(null, Zelem, i)){
+                        elems.push(elem);
+                    }
+                });
+                if(elems.length){
+                    return $1k(elems);
+                }
+                return null;
+            }else{
+                if(!fn.call(null, this, 0)){
+                    return null;
+                }
+                return $1k(this.elem);
+            }
+        }
+    },
+	Operate: {
+		elem_s: function(html){
+			return $1k($elem(html));
+		},
+		append_p: function(newNode, index){
+			return $box.call(this, $append, newNode, index);
+		},
+		insert_p: function(newNode, insertAfter){
+			return $box.call(this, $insert, newNode, insertAfter);
+		},
+		remove_p: function(){
+			return $box.call(this, $remove);
+		},
+		clone_p: function(deepCopy){
+			return $1k($clone(this.elem, deepCopy));
+		},
+		replace_p: function(newNode){
+			return $box.call(this, $replace, newNode);
+		},
+		each_p: function(func){
+			if(this.elems){
+				$each(this.elems, function(elem, i){
+					return func.call($1k(elem), i);
+				});
+            }else if(this.elem){
+				func.call(this, 0);
+			}
+			return this;
+		}
+    },
+    Style: {
+		cls_p: function(cls1, cls2){
+			return $box.call(this, $cls, cls1, cls2);
+		},
+		css_p: function(name, value){
+			return $box.call(this, $css, name, value);
+		},
+		px_p: function(name){
+			return $cssnum(this.elem, name);
+		},
+		left_p: function(value){
+			return $box.call(this, $left, value);
+		},
+		top_p: function(value){
+			return $box.call(this, $top, value);
+		},
+		width_p: function(value){
+			return $box.call(this, $width, value);
+		},
+		height_p: function(value){
+			return $box.call(this, $height, value);
+		},
+		offset_p: function(){
+			return $offset(this.elem);
+		},
+		offsetLeft_p: function(){
+			return $offset(this.elem).left;
+		},
+		offsetTop_p: function(){
+			return $offset(this.elem).top;
+		},
+		offsetWidth_p: function(){
+			return this.elem.offsetWidth;
+		},
+		offsetHeight_p: function(){
+			return this.elem.offsetHeight;
+		},
+		opacity_p: function(opacity){
+			return $box.call(this, $opacity, opacity);
+		},
+		show_p: function(){
+			return $box.call(this, $show);
+		},
+		hide_p: function(){
+			return $box.call(this, $hide);
+		}
+    },
+    event: {
+        ready_s: function(fn){
+            $ready(fn);
+        },
+		on_p: function(type, func, context){
+			var result = $bind.call(this, this.elem, type, func, context || this);
+			if(this.elems && result == this){
+				var i = 1;
+				while(this.elems[i]){
+					$bind.call(this, this.elems[i], type, func, context || this.eq(i));
+					i++;
+				}
+				return this;
+            }else{
+				return result;
+			}
+		},
+		un_p: function(type, func, context){
+			var result = $unbind.call(this, this.elem, type, func, context || this);
+			if(this.elems && result == this){
+				var i = 1;
+				while(this.elems[i]){
+					$unbind.call(this, this.elems[i], type, func, context || this.eq(i));
+					i++;
+				}
+				return this;
+            }else{
+				return result;
+			}
+		},
+		click_p: function(func, context){
+			var result = $bind.call(this, this.elem, 'click', func, context || this);
+			if(this.elems && result == this){
+				var i = 1;
+				while(this.elems[i]){
+					$bind.call(this, this.elems[i], 'click', func, context || this.eq(i));
+					i++;
+				}
+				return this;
+            }else{
+				return result;
+			}
+		},
+		hover_p: function(hover, out, context){
+			var elem,
+			self = this;
+			if(this.elems){
+				var i = 0;
+				while(elem = this.elems[i]){
+					!function(_who){
+						var elem = _who.elem;
+						$bind(elem, 'mouseover', function(evt){
+							if(evt.fromTarget && !$contains(elem, evt.fromTarget) || !evt.fromTarget)hover.call(context || _who, evt);
+						}, context || _who);
+						$bind(elem, 'mouseout', function(evt){
+							if(!evt.toTarget || !$contains(elem, evt.toTarget))out.call(context || _who, evt);
+						}, context || _who);
+					}(this.eq(i));
+					i++;
+				}
+            }else{
+				elem = this.elem;
+				$bind(elem, 'mouseover', function(evt){
+					if(evt.fromTarget && !$contains(elem, evt.fromTarget) || !evt.fromTarget)hover.call(context || self, evt);
+				}, context || self);
+				$bind(elem, 'mouseout', function(evt){
+					if(!evt.toTarget || !$contains(elem, evt.toTarget))out.call(context || self, evt);
+				}, context || self);
+			}
+			return this;
+		}
+    }, 
+    Other: {
+		attr_p: function(name, value){
+			return $box.call(this, $attr, name, value);
+		},
+		html_p: function(html){
+			return $box.call(this, $html, html);	
+		},
+		tag_p: function(nodeName){
+			return $tag(this.elem, nodeName);
+		},
+		contains_p: function(elem){
+			return $contains(this.elem, elem);
+		},
+		val_p: function(value){
+			return $box.call(this, $val, value);
+		},
+		length_p: function(){
+			return this.elems.length || 1;
+		}
+    }
+},
+BOM: {
+    browser_s: '$browser',
+    isIE6_s: '$isIE6',
+    cookie_s: '$cookie',
+    scrollTop_s: function(){
+        return $scrollTop.apply(this, arguments);
+    },
+    scrollLeft_s: function(){
+        return $DE.scrollLeft + $DOC.body.scrollLeft;
+    },
+    docWidth_s: function(){
+        return $DE.clientWidth;
+    },
+    docHeight_s: function(){
+        return $DE.clientHeight;
+    },
+    scrollWidth_s: function(){
+        return $DE.scrollWidth;
+    },
+    scrollHeight_s: function(){
+        return Math.max($DE.scrollHeight, $DOC.body.scrollHeight);
+    }
+}, 
+Request: {
+    ajax_s: '$ajax',
+    post_s: '$post',
+    get_s: '$get',
+    img_s: '$img',
+    js_s: '$js',
+    jsonp2_s: '$jsonp2',
+    style_s: '$style'
+},
+Other: {
+    type_s: '$type',
+    isArray_s: '$isArray',
+    isFunction_s: '$isFunction',
+    echo_s: function(){}
+},
+Object: {
+    each_s: '$each',
+    toJson_s: function(obj){
+        if($WIN.JSON && JSON.stringify){
+            return JSON.stringify(obj);
+        }
+        return $toJson(obj);
+    },
+    param_s: '$param',
+    mix_s: '$mix'
+},
+String: {
+    tirm_s: '$tirm',
+    parseJson_s: function(str){
+        if($WIN.JSON && JSON.parse){
+            return JSON.parse(str);
+        }
+        return $parseJson(str);
+    },
+    encodeURL_s: '$encodeURL',
+    encodeHTML_s: '$encodeHTML',
+    decodeHTML_s: '$decodeHTML'  
+},
+widget: {
+        Anim_p: function(attrs, options){
+            $each(this.elems || [this.elem], function(elem, i){
+                var animId = elem.__ANIMID__;
+                if(!animId){
+                    animId = elem.__ANIMID__ = ++$GUID
+                }else{
+                    $AnimHook[animId].stop();
+                }
+                $AnimHook[animId] = $Anim(elem, attrs, options);
+            });
+            return this;
+        },
+        Drag_p: function(options){
+            if(!this.elem.__DRAGID__){
+                $DragHook[this.elem.__DRAGID__ = ++$GUID] = $Drag(this.elem, options || {});
+            }
+            return $DragHook[this.elem.__DRAGID__];
+        },
+    /*
+       @syntax anim(cssAttr,callback) 快速执行一个简单动画
+       @params
+       cssAttr Object css属性的hashmap
+       callback function  动画完成后的回调
+    */  
+        anim_p: function(cssAttr, callback){
+            //console.info(cssAttr);
+            $anim(this.elem, cssAttr, callback)
+            //return $box.call(this, $anim, cssAttr, callback);
+        }
+},
+end:{}
+};
+		var CODE = {"$browser":{"source":"$browser = function(){\r\n    var \r\n    ua = navigator.userAgent.toLowerCase(),\r\n    sys = {},\r\n    s;\r\n    (s = ua.match(/msie ([\\d.]+)/)) ? sys.ie = s[1] :\r\n    (s = ua.match(/firefox\\/([\\d.]+)/)) ? sys.firefox = s[1] :\r\n    (s = ua.match(/(?:opera.|opr\\/)([\\d.]+)/)) ? sys.opera = s[1] :\r\n    (s = ua.match(/chrome\\/([\\d.]+)/)) ? sys.chrome = s[1] :\r\n    (s = ua.match(/version\\/([\\d.]+).*safari/)) ? sys.safari = s[1] : 0;\r\n    return sys;\r\n}();"},"$isIE6":{"source":"$isIE6 = /MSIE\\s*6.0/i.test(navigator.appVersion);"},"$cookie":{"source":"function $cookie(name, value, options){\r\n    if(typeof name == 'object'){ //setCookies\r\n        for(var e in name){\r\n            $cookie(e, name[e], value);\r\n        }\r\n    }else{\r\n        if(typeof value != 'undefined'){ //setCookie or deleteCookie\r\n        \r\n            var str = name + \"=\" + encodeURIComponent(value);\r\n            if(value === null){ //value === null ,则设置cookie为过期\r\n                options.expires = -1;\r\n            }else if(typeof options == 'number'){\r\n                options = {expires: options};\r\n            }else{\r\n                options = options || {};\r\n            }\r\n            if(options.expires){\r\n                var exp = new Date;\r\n                exp.setTime(+exp + options.expires * 60 * 1000); //以分钟为单位\r\n                str += \"; expires=\" + exp.toUTCString();\r\n            }\r\n            if(options.path){\r\n                str += \"; path=\" + options.path;\r\n            }\r\n            if(options.domain){\r\n                str += \"; domain=\" + options.domain;\r\n            }\r\n            $DOC.cookie = str;\r\n        }else{ //getCookie\r\n            return (v = $DOC.cookie.match('(?:^|;)\\\\s*' + name + '=([^;]*)'))\r\n                ? decodeURIComponent(v[1]) : null;\r\n        }\r\n    }\r\n}","use":{"$DOC":1}},"$scrollTop":{"source":"$scrollTop = function(){\r\n    var tr,\r\n        cr = $browser.chrome;\r\n    return function(y, t, tp){\r\n        var ds = cr ? $DOC.body : $DE;\r\n        switch(arguments.length){\r\n            case 0: return ds['scrollTop'];\r\n            case 1: return ds['scrollTop'] = y;\r\n            default:\r\n                var s0 = 0,\r\n                    s1 = Math.ceil(t/15),\r\n                    z0 = ds['scrollTop'],\r\n                    tp = function(t,b,c,d){\r\n                        return c * Math.sqrt(1 - (t=t/d-1)*t) + b;\r\n                    },\r\n                    zc = y - z0;\r\n                clearTimeout(tr);\r\n                function run(){\r\n                    tr = setTimeout(function(){\r\n                        if(s0 < s1){ \r\n                            ds['scrollTop'] = tp(s0, z0, zc, s1);\r\n                            run();\r\n                        }else{\r\n                            ds['scrollTop'] = y;\r\n                            clearTimeout(tr);\r\n                        }\r\n                        s0 ++;\r\n                    }, 15);\r\n                }\r\n                run();\r\n        }\r\n    \r\n    };\r\n}();","use":{"$browser":1,"$DOC":1,"$DE":1}},"$PID":{"source":"$PID = 1;"},"$GUID":{"source":"$GUID = 1;"},"$WIN":{"source":"$WIN = window;"},"$DOC":{"source":"$DOC = document;"},"$DE":{"source":"$DE = $DOC.documentElement;","use":{"$DOC":1}},"$HEAD":{"source":"$HEAD = $DOC.head || $query('head')[0];","use":{"$DOC":1,"$query":1}},"$DP":{"source":"$DP = $Dom.prototype;","use":{"$Dom":1}},"$queryAll":{"source":"$queryAll = $DOC.querySelectorAll;","use":{"$DOC":1}},"$Class":{"source":"$Class = function(){\r\n    return{\r\n        extend: extend\r\n    };\r\n    function extend(){\r\n        function Class(args){\r\n            if(this instanceof Class){ //已经实例化，调用init\r\n                if(this.init){ //自动new的情况，所有参数都会存在args.____中，否则取全部参数，注意args中不能传递args.____\r\n                    this.init.apply(this, args && args.____ ? args.____ : arguments);\r\n                }\r\n            }else{\r\n                return new Class({\r\n                    ____: arguments\r\n                });\r\n            }\r\n        }\r\n\r\n        Class.prototype = function(prop, source){\r\n            empty.prototype = this.prototype;\r\n            var \r\n            method,\r\n            superMethod,\r\n            superProp = new empty, //通过空函数实现只继承原型\r\n            i;\r\n            for(i in prop){\r\n                method = prop[i];\r\n                superMethod = superProp[i];\r\n                superProp[i] = //需要调用父类的方法，则使用闭包进行包装\r\n                $isFunction(method) \r\n                && $isFunction(superMethod) \r\n                && /\\._super\\(/.test(method) //函数体包含._super(      \r\n                ? pack(method, superMethod) : method;\r\n            }\r\n            if(source){\r\n                for(i in source){\r\n                    Class[i] = source[i];\r\n                }\r\n            }\r\n            superProp.constructor = Class;\r\n            superProp.superclass = this;\r\n            return superProp;\r\n            \r\n            function empty(){}\r\n            function pack(method, superMethod){\r\n                return function(){\r\n                    this._super = superMethod;\r\n                    var ret = method.apply(this, arguments);\r\n                    this._super = null;\r\n                    return ret;\r\n                };\r\n            }\r\n        }.apply(this, arguments);\r\n        \r\n        Class.extend = extend; //实现链式，执行Class.extend()时，this自动指向Class\r\n        return Class;\r\n    }\r\n}();","use":{"$isFunction":1}},"$Erro":{"source":"function $Erro(msg){\r\n    return {msg:msg};\r\n}"},"$noop":{"source":"function $noop(){}"},"$ready":{"source":"function $ready(fn){\r\n    var \r\n    isReady = false, //判断是否触发onDOMReady\r\n    readyList = [], //把需要执行的方法先暂存在这个数组里\r\n    ready = function(fn) {\r\n        isReady ? fn($1k) : readyList.push(fn);\r\n    },\r\n    onReady = function(){\r\n        if(isReady)return;\r\n        isReady = true;\r\n        for(var i = 0, lg = readyList.length; i < lg; i++){\r\n            readyList[i]($1k);\r\n        } \r\n        if($DOC.removeEventListener){\r\n            $DOC.removeEventListener('DOMContentLoaded', onReady, false);\r\n        }else if($DOC.attachEvent){\r\n            $DOC.detachEvent('onreadystatechange', onReady);\r\n            if(timer){\r\n                clearInterval(timer);\r\n                timer = null;\r\n            }\r\n        }\r\n        readyList = null;\r\n        onReady = null;\r\n    };\r\n    if($DOC.readyState == 'complete'){\r\n        onReady();\r\n    }else if($DOC.addEventListener){\r\n        $DOC.addEventListener('DOMContentLoaded', onReady, false);\r\n    }else if($DOC.attachEvent){\r\n        $DOC.attachEvent('onreadystatechange', function(){\r\n            /loaded|complete/.test($DOC.readyState) && onReady && onReady();\r\n        });\r\n        \r\n        try {\r\n            var toplevel = $WIN.frameElement == null;\r\n        }catch(e){}\r\n        \r\n        if(toplevel){\r\n            var timer = setInterval(function(){\r\n                try{\r\n                    isReady || $DOC.documentElement.doScroll('left'); //在IE下用能否执行doScroll判断dom是否加载完毕\r\n                    //http://javascript.nwbox.com/IEContentLoaded/\r\n                }catch(e){\r\n                    return;\r\n                }\r\n                onReady();\r\n            }, 16);\r\n        }\r\n    }\r\n    ($ready = ready)(fn);\r\n};","use":{"$1k":1,"$DOC":1,"$WIN":1}},"$EventHook":{"source":"$EventHook = {};"},"$addEvent":{"source":"$addEvent = function(){\r\n    ($addEvent = $DOC.addEventListener ? function(node, type, fn){\r\n        node.addEventListener(type == 'mousewheel' && $DOC.mozHidden !== undefined ? 'DOMMouseScroll' : type, fn, false); \r\n    } : function(node, type, fn){\r\n        node.attachEvent('on' + type,fn); \r\n    }).apply(null, arguments);\r\n\r\n};","use":{"$DOC":1}},"$removeEvent":{"source":"$removeEvent = function(){\r\n    ($removeEvent = $DOC.removeEventListener ? function(node, type, fn){\r\n        node.removeEventListener(type == 'mousewheel' && $DOC.mozHidden !== undefined ? 'DOMMouseScroll' : type, fn, false); \r\n    } : function(node, type, fn){\r\n        node.detachEvent('on' + type, fn);\r\n    }).apply(null, arguments);\r\n};","use":{"$DOC":1}},"$Evt":{"source":"function $Evt(evt){\r\n    var _evt = {\r\n        origin: evt,\r\n        type: evt.type,\r\n        keyCode: evt.keyCode,\r\n        clientX: evt.clientX,\r\n        clientY: evt.clientY,\r\n        target: evt.target || evt.srcElement,\r\n        fromTarget: evt.fromElement || (evt.type == 'mouseover' ? evt.relatedTarget : null),\r\n        toTarget: evt.toElement || (evt.type == 'mouseout' ? evt.relatedTarget : null),\r\n        stopPropagation: function(){\r\n            evt.stopPropagation \r\n                ? evt.stopPropagation() \r\n                : (evt.cancelBubble = true);\r\n        },\r\n        mouseKey: ($browser.ie ? {1: 'L', 4: 'M', 2: 'R'} : {0: 'L', 1: 'M', 2: 'R'})[evt.button],\r\n        preventDefault: function(){\r\n            evt.preventDefault \r\n                ? evt.preventDefault()\r\n                : (evt.returnValue = false);\r\n        },\r\n        delta: evt.type == 'mousewheel' \r\n            ? evt.wheelDelta\r\n            : evt.type == 'DOMMouseScroll'\r\n                ? evt.detail * -40\r\n                : null\r\n    };\r\n    return _evt;\r\n}","use":{"$browser":1}},"$bind":{"source":"function $bind(node, type, func, context){\r\n    if(!node.__EVENTID__){//没有有事件队列\r\n        $EventHook[node.__EVENTID__ = ++$GUID] = [];\r\n    }\r\n    var EQ = $EventHook[node.__EVENTID__];\r\n    if(!EQ[type]){//无该类型的事件队列\r\n        EQ[type] = [];\r\n        $addEvent(node, type, function(evt){\r\n            var Q = EQ[type].slice(0);\r\n            while(Q[0]){\r\n                Q[0].func.call(Q[0].context, $Evt(evt));\r\n                Q.shift();\r\n            }\r\n        });\r\n    }\r\n    EQ[type].push({\r\n        func: func,\r\n        context: context || node\r\n    });\r\n    return this;\r\n}","use":{"$EventHook":1,"$GUID":1,"$addEvent":1,"$Evt":1}},"$unbind":{"source":"function $unbind(node, type, func, context){\r\n    var Q = $EventHook[node.__EVENTID__][type], i = 0;\r\n    while(Q[i]){\r\n        if(Q[i].func == func && (Q[i].context == (context || node) || (context.__DOM__ && context.elem == Q[i].context.elem))){\r\n            Q.splice(i, 1);\r\n            break;\r\n        }\r\n        i++;\r\n    }\r\n    return this;\r\n}","use":{"$EventHook":1}},"$1k":{"source":"function $1k(selector, context){\r\n    switch($type(selector)){\r\n        case 'function':\r\n            return $ready(selector);\r\n        case 'element':    \r\n        case 'window':    \r\n        case 'document':    \r\n        case 'array':\r\n            return new $Dom(selector);\r\n        case 'string':\r\n            if(selector.indexOf('<') == 0){ //html\r\n                return $1k($elem(selector));\r\n            }\r\n            return $1k($query(selector, context));\r\n        \r\n    }\r\n    return null;\r\n}","use":{"$type":1,"$ready":1,"$Dom":1,"$elem":1,"$query":1}},"$Dom":{"source":"function $Dom(elements){\r\n    //$DP\r\n    if($isArray(elements)){\r\n        this.elems = elements;\r\n        this.elem = elements[0];\r\n    }else{\r\n        this.elem = elements;\r\n    }\r\n    this.__DOM__ = 1;\r\n}","use":{"$DP":1,"$isArray":1}},"$box":{"source":"function $box(func, arg1, arg2, arg3){\r\n    var result = func.call(this, this.elem, arg1, arg2, arg3);\r\n    if(this.elems && result == this){\r\n        var i = 1;\r\n        while(this.elems[i]){\r\n            func.call(this, this.elems[i], arg1, arg2, arg3);\r\n            i++;\r\n        }\r\n        return this;\r\n    }else{\r\n        return result;\r\n    }\r\n}"},"$elem":{"source":"function $elem(node){\r\n    if($isElement(node))return node;\r\n    if($isDom(node))return node.elem;\r\n    \r\n    if(~node.indexOf('<')){ //非标准创建节点\r\n        var prarent = $DOC.createElement('div');\r\n        prarent.innerHTML = $tirm(node);\r\n        return prarent.firstChild;\r\n    }else{\r\n        return $DOC.createElement(node);\r\n    }\r\n}","use":{"$isElement":1,"$isDom":1,"$DOC":1,"$tirm":1}},"$parent":{"source":"function $parent(node, selector){\r\n    if(selector == undefined){\r\n        return node.parentNode;\r\n    }else if(selector > 0){\r\n        selector++;\r\n        while(selector--){\r\n            node = node.parentNode;\r\n        }\r\n        return node;\r\n    }else{\r\n        selector = selector.match(/^(?:#([\\w\\-]+))?\\s*(?:(\\w+))?(?:.([\\w\\-]+))?(?:\\[(.+)\\])?$/);\r\n        if(selector){\r\n            var id = selector[1],\r\n                tag = selector[2],\r\n                cls = selector[3],\r\n                attr = selector[4];\r\n            tag = tag && tag.toUpperCase();\r\n            attr = attr && attr.split('=');\r\n        }else{\r\n            return null;\r\n        }\r\n        \r\n        while(node = node.parentNode){\r\n            if(\r\n                (!id || node.id == id)\r\n                && (!cls || cls && $hcls(node, cls))\r\n                && (!tag || node.nodeName == tag)\r\n                && (!attr || $attr(node, attr[0]) == attr[1])\r\n            ){\r\n                return node;\r\n            }\r\n        }	\r\n        \r\n    }\r\n    return null;\r\n}","use":{"$hcls":1,"$attr":1}},"$offset":{"source":"function $offset(node){\r\n    var top = 0, left = 0;\r\n    if ('getBoundingClientRect' in $DE){\r\n        //jquery方法\r\n        var \r\n        box = node.getBoundingClientRect(), \r\n        body = $DOC.body, \r\n        clientTop = $DE.clientTop || body.clientTop || 0, \r\n        clientLeft = $DE.clientLeft || body.clientLeft || 0,\r\n        top  = box.top  + ($WIN.pageYOffset || $DE && $DE.scrollTop  || body.scrollTop ) - clientTop,\r\n        left = box.left + ($WIN.pageXOffset || $DE && $DE.scrollLeft || body.scrollLeft) - clientLeft;\r\n    }else{\r\n        do{\r\n            top += node.offsetTop || 0;\r\n            left += node.offsetLeft || 0;\r\n            node = node.offsetParent;\r\n        } while (node);\r\n    }\r\n    return {left: left, top: top, width: node.offsetWidth, height: node.offsetHeight};\r\n}","use":{"$DE":1,"$DOC":1,"$WIN":1}},"$cssnum":{"source":"function $cssnum(node, attr){\r\n    var val = +$rmvpx($css(node, attr)) || 0;\r\n    if(/^width|height|left|top$/.test(attr)){\r\n        switch(attr){\r\n            case 'left': return val || node.offsetLeft - $cssnum(node, 'marginLeft');\r\n            case 'top': return val || node.offsetTop - $cssnum(node, 'marginTop');\r\n            case 'width': return val\r\n                || (node.offsetWidth\r\n                    - $cssnum(node, 'paddingLeft')\r\n                    - $cssnum(node, 'paddingRight')\r\n                    - $cssnum(node, 'borderLeftWidth')\r\n                    - $cssnum(node, 'borderRightWidth')\r\n                );\r\n            case 'height': return val\r\n                || (node.offsetHeight\r\n                    - $cssnum(node, 'paddingTop')\r\n                    - $cssnum(node, 'paddingBottom')\r\n                    - $cssnum(node, 'borderTopWidth')\r\n                    - $cssnum(node, 'borderBottomWidth')\r\n                );\r\n        }\r\n    }\r\n    return val;\r\n}","use":{"$rmvpx":1,"$css":1}},"$left":{"source":"function $left(node, value){\r\n    if(value != undefined){\r\n        $css(node, 'left', value);\r\n        return this;\r\n    }\r\n    return $cssnum(node, 'left');\r\n}","use":{"$css":1,"$cssnum":1}},"$top":{"source":"function $top(node, value){\r\n    if(value != undefined){\r\n        $css(node, 'top', value);\r\n        return this;\r\n    }\r\n    return $cssnum(node, 'top');\r\n}","use":{"$css":1,"$cssnum":1}},"$width":{"source":"function $width(node, value){\r\n    if(value != undefined){\r\n        $css(node, 'width', value);\r\n        return this;\r\n    }\r\n    return $cssnum(node, 'width');\r\n}","use":{"$css":1,"$cssnum":1}},"$height":{"source":"function $height(node, value){\r\n    if(value != undefined){\r\n        $css(node, 'height', value);\r\n        return this;\r\n    }\r\n    return $cssnum(node, 'height');\r\n}","use":{"$css":1,"$cssnum":1}},"$tag":{"source":"function $tag(node, nodeName){\r\n    if(typeof nodeName != 'undefined'){\r\n        return nodeName == node.nodeName;\r\n    }\r\n    return node.nodeName;\r\n}"},"$val":{"source":"function $val(node, val){\r\n    if(val == undefined)return node.value.replace(/^\\s+|\\s+$/g, '');\r\n    node.value = val;\r\n    return this;\r\n}"},"$clone":{"source":"function $clone(node, flag){\r\n    node = node.cloneNode(flag);\r\n    return node;\r\n}"},"$replace":{"source":"function $replace(node, newNode){\r\n    node.parentNode.replaceChild($elem(newNode), node);\r\n    return this;\r\n}","use":{"$elem":1}},"$append":{"source":"function $append(node, newNode, index){\r\n    if($isArray(newNode)){\r\n        var root = $DOC.createDocumentFragment();\r\n        $each(newNode, function(elem){\r\n            root.appendChild($elem(elem));\r\n        });\r\n        newNode = root;\r\n    }else{\r\n        newNode = $elem(newNode);\r\n    }\r\n    if(index == undefined){\r\n        node.appendChild(newNode);\r\n        return this;\r\n    }\r\n    var child = node.children;\r\n    if(index > -1){\r\n        child = child[index];\r\n    }else if(index < 0){\r\n        child = child[Math.max(child.length + index + 1, 0)];\r\n    }\r\n    if(child){\r\n        child.parentNode.insertBefore(newNode, child);\r\n    }else{\r\n        node.appendChild(newNode);\r\n    }\r\n    return this;\r\n}","use":{"$isArray":1,"$DOC":1,"$each":1,"$elem":1}},"$html":{"source":"function $html(node, html){\r\n    var type = typeof html,\r\n        _html = '';\r\n    if(type == 'undefined'){\r\n        return node.innerHTML;\r\n    }else if(type == 'function'){\r\n        _html = html();\r\n    }else if(type == 'object'){\r\n        $each(html, function(html){\r\n            _html += html;\r\n        });\r\n    }else{\r\n        _html = html;\r\n    }\r\n    if(node.nodeName == 'SELECT' && type != 'undefined' && $browser.ie){\r\n        var s = document.createElement('span');\r\n        s.innerHTML = '<select>' + _html + '</select>';\r\n        node.innerHTML = '';\r\n        $each($query('option', s), function(option){\r\n            node.appendChild(option);\r\n        });\r\n    }else{\r\n        node.innerHTML = _html;\r\n    }\r\n    return this;\r\n}","use":{"$each":1,"$browser":1,"$query":1}},"$remove":{"source":"function $remove(node){\r\n    node.parentNode.removeChild(node);\r\n    return this;\r\n}"},"$attr":{"source":"function $attr(node, name, value){\r\n    if(value === null){\r\n        node.removeAttribute(name);\r\n    }else if(value != undefined){\r\n        if(typeof name == 'object'){\r\n            for(var attr in name){\r\n                $attr(node, attr, name[attr]);\r\n            }\r\n        }else{\r\n            if(name == 'style'){\r\n                node.style.cssText = value;\r\n            }else{\r\n                if(node[name] != undefined){//优先设置js属性\r\n                    node[name] = value;\r\n                }else{\r\n                    node.setAttribute(name, value, 2);\r\n                }\r\n            }\r\n        }\r\n    }else{\r\n        if(name == 'style'){\r\n            return node.style.cssText;\r\n        }else{\r\n            if(name == 'href' && node.nodeName == 'A'){\r\n                return node.getAttribute(name, 2);\r\n            }else{	\r\n                if(node[name] != undefined){//优先获取js属性\r\n                    return node[name];\r\n                }else{\r\n                    var val = node.getAttribute(name);\r\n                    return val == null ? void(0) : val;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    return this;\r\n}"},"$contains":{"source":"function $contains(pnode, cnode){\r\n    if(cnode == pnode)return 1;\r\n    return pnode.contains \r\n        ? pnode.contains(cnode) \r\n            ? 2 : 0\r\n        : pnode.compareDocumentPosition(cnode)\r\n            ? 2 : 0;\r\n    /*\r\n    if(pnode.contains){//ie下判断是不是属于contains容器中的节点\r\n        console.info(pnode,cnode);\r\n        if(pnode.contains(cnode)){\r\n            return 2;\r\n        }\r\n    }else if(pnode.compareDocumentPosition){//非ie下判断\r\n        if(pnode.compareDocumentPosition(cnode) == 20){\r\n            return 2;\r\n        }\r\n    }//*/\r\n    return 0;\r\n}"},"$query":{"source":"function $query(){\r\n    var\r\n    rQuickExpr = /^([#.])?([\\w\\-]+|\\*)$/,\r\n    rChildExpr = /^(?:#([\\w\\-]+))|([\\w-]+)?(?:\\.([\\w\\-]+))?(?:\\[(.+)\\])?$/, //[id,tag,cls,attr]\r\n    rChildExpr2 = /(?:[\\w\\-]+)?(?:\\.[\\w\\-]+)?(?:\\[.+\\])?/.source,\r\n    rAllExpr = RegExp('^(#[\\\\w\\\\-]+|'+rChildExpr2+')(?:\\\\s+('+rChildExpr2+'))$'),\r\n    suportSel = $DOC.querySelectorAll,\r\n    uid = 0;\r\n    return ($query = query).apply(null, arguments);\r\n    function query(selector, context){\r\n        var\r\n        result,\r\n        elems,\r\n        match = rQuickExpr.exec(selector),\r\n        m1, m2;\r\n        if(match){ //快速匹配 #id,.cls,tag\r\n            m1 = match[1];\r\n            m2 = match[2];\r\n            if(m1 == '#'){\r\n                return $DOC.getElementById(m2);\r\n            }\r\n            if(m1 == '.'){\r\n                if($DOC.getElementsByClassName){\r\n                    return makeArray((context || $DOC).getElementsByClassName(m2));\r\n                }else{\r\n                   return filterByClassName(query('*', context), m2);\r\n                }\r\n            }\r\n            return makeArray((context || $DOC).getElementsByTagName(m2));\r\n        }\r\n        if(suportSel){\r\n            \r\n            if(context && context.nodeType != 9 ){\r\n                var \r\n                oldid = context.id,\r\n                fixid = '_queryFix_';\r\n                selector = '#' + (context.id = fixid) + ' '+ selector;\r\n            }\r\n            \r\n            (elems = (context || $DOC).querySelectorAll(selector)) && (elems = unique(elems));\r\n            fixid && (oldid ? (context.id = oldid) : context.removeAttribute('id'));\r\n            return elems.length ? elems : null;\r\n        }else{\r\n            \r\n            if(~selector.indexOf(',')){\r\n                result = [];\r\n                forEach(selector.split(','), function(selector){\r\n                    (elems = query(selector, context)) && (elems.length ? (result = result.concat(elems)) : result.push(elems));\r\n                });\r\n                return result.length ? unique(result) : null;\r\n            }else{\r\n                match = rAllExpr.exec(selector);\r\n\r\n                if(match){ //#id tag\r\n                    m1 = match[1];\r\n                    m2 = match[2];\r\n                    elems = query(m1, context);\r\n                    \r\n                    if(elems){\r\n                        if(m2){ //=> #id tag.cls[attr=val] \r\n                            result = [];\r\n                            var ret;\r\n                            forEach(elems.length ? elems : [elems], function(context){\r\n                                (ret = query(m2, context)) && (ret.length ? (result = result.concat(ret)) : result.push(ret));\r\n                            });\r\n                            \r\n                            return result.length ? unique(result) : null;\r\n                        }else{\r\n                            return elems;\r\n                        }\r\n                    }\r\n                    return null; \r\n                }else{\r\n                    match = rChildExpr.exec(selector);\r\n                    if(match){\r\n                        var \r\n                        id = match[1],\r\n                        tag = match[2],\r\n                        cls = match[3],\r\n                        attr = match[4];\r\n                        if(id){\r\n                            return query(id);\r\n                        }\r\n                        elems = query(tag || '*', context);\r\n                        cls && (elems = filterByClassName(elems, cls));\r\n                        attr && (elems = filterByAttr(elems, attr));\r\n                        return elems;\r\n                    }\r\n                    return null;\r\n                } \r\n            }\r\n        }\r\n    }\r\n    function forEach(arr, fn){\r\n        if(arr && arr.length){\r\n            for(var i = 0, lg = arr.length; i < lg; i++){\r\n                fn(arr[i], i);\r\n            }\r\n        }\r\n    }\r\n    function makeArray(elems){\r\n        if(!elems){\r\n            return null;\r\n        }\r\n        var result = [];\r\n        if(+[1,]){\r\n            result = [].slice.call(elems, 0);\r\n        }else{\r\n            forEach(elems, function(elem){\r\n                result.push(elem);\r\n            });\r\n        }\r\n        return result.length ? result : null;\r\n    }\r\n    function unique(elems){\r\n        ++uid;\r\n        var result = [];\r\n        forEach(elems, function(elem){\r\n            if(elem._forUnique_ != uid){\r\n                elem._forUnique_ = uid;\r\n                result.push(elem);\r\n            }\r\n        });\r\n        return result;\r\n    }\r\n    function filterByClassName(elems, className){\r\n        var\r\n        rClassName = RegExp('(^|\\\\s+)'+ className +'($|\\\\s+)'),\r\n        result = [];\r\n        forEach(elems, function(elem){\r\n            rClassName.test(elem.className) && result.push(elem); \r\n        });\r\n        return result.length ? result : null;\r\n    }\r\n    function filterByAttr(elems, attr){\r\n        var \r\n        result = [],\r\n        key, val;\r\n        attr = attr.split('=');\r\n        if(attr.length == 2){\r\n            key = attr[0];\r\n            val = attr[1] || '';\r\n        }\r\n        forEach(elems, function(elem){\r\n            if(val){\r\n                (elem.getAttribute(key) == val) && result.push(elem);\r\n            }else{\r\n                elem.hasAttribute(attr) && result.push(elem);\r\n            }\r\n            \r\n        });\r\n        return result.length ? result : null;  \r\n    }\r\n}","use":{"$DOC":1}},"$prev":{"source":"function $prev(node){\r\n    while(node = node.previousSibling){\r\n        if(node.nodeType == 1){\r\n            return node;\r\n        }\r\n    }\r\n}"},"$next":{"source":"function $next(node){\r\n    while(node = node.nextSibling){\r\n        if(node.nodeType == 1){\r\n            return node;\r\n        }\r\n    }\r\n}"},"$child":{"source":"function $child(node, index){\r\n    var child = node.children;\r\n    if(index > -1){\r\n        child = child[index];\r\n    }else if(index < 0){\r\n        child = child[child.length + index];\r\n    }else if(typeof index == 'string'){\r\n        var returns = [];\r\n        $each($query(index, node) || returns, function(elem){\r\n            (elem.parentNode == node) && returns.push(elem);\r\n        });\r\n        return returns.length ? returns : null;\r\n    }\r\n    return child;\r\n}","use":{"$each":1,"$query":1}},"$show":{"source":"function $show(node){\r\n    node.style.display = 'block';\r\n    return this;\r\n}"},"$hide":{"source":"function $hide(node){\r\n    node.style.display = 'none';\r\n    return this;\r\n}"},"$opacity":{"source":"function $opacity(node, opacity){\r\n    if($browser.ie && $browser.ie < 9){\r\n        var \r\n        filter = node.currentStyle.filter,\r\n        hasAlpha = filter && /alpha/i.test(filter),\r\n        filterStr;\r\n        if(opacity === undefined){\r\n            if(hasAlpha){\r\n                return +filter.match(/opacity[\\s:=]+(\\d+)/i)[1]/100;\r\n            }\r\n            return 1;\r\n        }\r\n        \r\n        if(opacity >= 1 || opacity == null){\r\n            // IE6-8设置alpha(opacity=100)会造成文字模糊\r\n            filterStr = filter.replace(/alpha[^\\)]+\\)/i, '');\r\n        }else{\r\n            opacity = Math.round(opacity * 100);//必须转成整数\r\n            if(hasAlpha){\r\n                filterStr = filter.replace(/(opacity\\D+)\\d+/i, 'opacity='+ opacity);\r\n            }else{\r\n                filterStr = filter +' '+ 'alpha(opacity=' + opacity + ')';\r\n            }\r\n        } \r\n        node.style.filter = filterStr;\r\n    }else{\r\n        if(opacity === undefined){\r\n            return (opacity = +$css(node, 'opacity')) > -1 ? opacity : 1;\r\n        }\r\n        node.style.opacity = opacity;\r\n    }\r\n    return this;\r\n}","use":{"$browser":1,"$css":1}},"$hcls":{"source":"function $hcls(node, cls){\r\n    return RegExp('(^|\\\\s)' + cls + '($|\\\\s)').test(node.className);\r\n}"},"$cls":{"source":"function $cls(node, cls, cls2){\r\n    \r\n    if(cls2){\r\n        if(node.className){\r\n            node.className = (' ' + node.className + ' ')\r\n                .replace(RegExp('\\\\s+(' + cls2 + ')(?=\\\\s+)'), cls)\r\n                .replace(/^\\s+|\\s+$/g, '');//清除头尾空格;\r\n        }\r\n        \r\n    }else if(cls){\r\n        var _exp = cls.charAt(0),\r\n            _cls = cls.substr(1);\r\n        if(/[+~-]/.test(_exp)){\r\n            var \r\n            ncls = node.className;\r\n            _cls = _cls.split(',');\r\n            switch(_exp){\r\n                case '+':\r\n                    if(ncls){//假如不为空，需要判断是否已经存在\r\n                    \r\n                        $each(_cls, function(val, i){\r\n                            if(!$hcls(node, val)){\r\n                                node.className += ' ' + val;\r\n                            }\r\n                        });\r\n                    }else{\r\n                        node.className = _cls.join(' ');\r\n                    }\r\n                    break;\r\n                case '-':\r\n                    if(ncls){\r\n                        node.className = (' ' + ncls + ' ')\r\n                            .replace(RegExp('\\\\s+(' + _cls.join('|') + ')(?=\\\\s+)', 'g'), '')//替换存在的className\r\n                            .replace(/^\\s+|\\s+$/g, '');//清除头尾空格\r\n                    }\r\n                    break;\r\n                case '~':\r\n                    if(ncls){\r\n                        $each(_cls, function(val, i){\r\n                            if(!$hcls(node, val)){\r\n                                node.className += ' ' + val;\r\n                            }else{\r\n                                $cls(node, '-'+ val);\r\n                            }\r\n                        });\r\n                    }else{\r\n                        node.className = _cls.join(' ');\r\n                    }\r\n                    break;\r\n            }\r\n        }else if(_exp == '='){\r\n            node.className = _cls;\r\n            return this;\r\n        }else{\r\n            _cls = cls.split(',');\r\n            var ret = true;\r\n            $each(_cls, function(val, i){\r\n                return !(ret = ret && $hcls(node, val));\r\n            });\r\n            return ret;\r\n        }\r\n    }else{\r\n        return node.className;\r\n    }\r\n    return this;\r\n}","use":{"$each":1,"$hcls":1}},"$addpx":{"source":"function $addpx(attr,val){\r\n    return val + (\r\n        /width|height|left|top|right|bottom|margin|padding/.test(attr) \r\n        && /^[\\-\\d.]+$/.test(val)\r\n        ? 'px' : '');\r\n}"},"$rmvpx":{"source":"function $rmvpx(val){\r\n    return /px$/.test(val) ? parseFloat(val) : val;\r\n}"},"$fixStyleName":{"source":"function $fixStyleName(name){\r\n    if(name == 'float'){\r\n        return $WIN.getComputedStyle ? 'cssFloat' : 'styleFloat';\r\n    }\r\n    return name.replace(/-(\\w)/g, function(_, $1){\r\n        return $1.toUpperCase();\r\n    });\r\n}","use":{"$WIN":1}},"$css":{"source":"function $css(node, name, value){\r\n    if(value !== undefined){\r\n        \r\n        name == 'opacity' && $browser.ie < 9\r\n            ? $opacity(node, value)\r\n            : (node.style[name = $fixStyleName(name)] = \r\n                value < 0 && /width|height|padding|border/.test(name) \r\n                    ? 0 //修正负值\r\n                    : value + (/width|height|left|top|right|bottom|margin|padding/.test(name) && /^[\\-\\d.]+$/.test(value) \r\n                        ? 'px'  //增加省略的px\r\n                        : '')\r\n            );        \r\n    }else if(typeof name == 'object'){\r\n        for(var key in name){\r\n            $css(node, key, name[key]);\r\n        }\r\n    }else{\r\n        if(~name.indexOf(':')){ //存在:,比如'background:red'\r\n            $each(name.replace(/;$/, '').split(';'), function(cssText){      \r\n                cssText = cssText.split(':');\r\n                $css(node, cssText.shift(), cssText.join(':'));\r\n                //?$css(node,cssText[0],cssText[1]);//background:url(http://www....)bug\r\n            });\r\n        }else{\r\n            return name == 'opacity' && $browser.ie < 9\r\n                ? $opacity(node)\r\n                : node.style && node.style[name = $fixStyleName(name)]\r\n                    || (node.currentStyle || getComputedStyle(node, null))[name];\r\n        }\r\n    }\r\n    return this;\r\n}","use":{"$browser":1,"$opacity":1,"$fixStyleName":1,"$each":1}},"$each":{"source":"function $each(obj, fn, context){\r\n    if($isArray(obj)){\r\n        for(var i = 0, lg = obj.length; i < lg; i++){\r\n            if(fn.call(context, obj[i], i)){\r\n                break;\r\n            }\r\n        }\r\n    }else{\r\n        for(var i in obj){\r\n            if(fn.call(context, obj[i], i)){\r\n                break;\r\n            }\r\n        }\r\n    }\r\n}","use":{"$isArray":1}},"$toJson":{"source":"function $toJson(obj){\r\n    switch(typeof obj){\r\n        case 'object':\r\n            if(obj == null){\r\n                return obj;\r\n            }\r\n            var E, _json = [];\r\n            if(Object.prototype.toString.apply(obj) == '[object Array]'){\r\n                for(var e = 0, L = obj.length; e < L; e++){\r\n                    _json[e] = arguments.callee(obj[e]);\r\n                }\r\n                return '[' + _json.join(',') + ']';\r\n            }\r\n            for(e in obj){\r\n                _json.push('\"' + e + '\":' + arguments.callee(obj[e]));\r\n            }\r\n            return '{' + _json.join(',') + '}';\r\n        case 'function':\r\n            obj = '' + obj;\r\n        case 'string':\r\n            return '\"' + obj.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\r/g, '\\\\r').replace(/\\n/g, '\\\\n') + '\"';\r\n        case 'number':\r\n        case 'boolean':\r\n        case 'undefined':\r\n            return obj;\r\n    }    \r\n    return obj;\r\n}"},"$param":{"source":"function $param(obj, nocache){\r\n    var query = [];\r\n    if(typeof obj == 'object'){\r\n        for(var E in obj){\r\n            if(/^e_/.test(E)){\r\n                query.push(E.substr(2) + '=' + $encodeURL(obj[E]));\r\n            }else{\r\n                query.push(E + '=' + obj[E]);\r\n            }\r\n        }\r\n    }\r\n    if(nocache)query.push('t=' + (+new Date));\r\n    return query.join('&');\r\n}","use":{"$encodeURL":1}},"$mix":{"source":"function $mix(target, source){\r\n    for(var key in source){\r\n        target[key] = source[key];\r\n    }\r\n}"},"$isArray":{"source":"function $isArray(obj){\r\n    return $type(obj) == 'array';\r\n}","use":{"$type":1}},"$isFunction":{"source":"function $isFunction(obj){\r\n    return typeof obj == 'function';\r\n}"},"$isElement":{"source":"function $isElement(obj){\r\n    return $type(obj) == 'element';\r\n}","use":{"$type":1}},"$isDom":{"source":"function $isDom(obj){\r\n    return obj && obj.__DOM__;\r\n}"},"$isUndefined":{"source":"function $isUndefined(obj){\r\n    return obj === undefined;\r\n}"},"$isObject":{"source":"function $isObject(obj){\r\n    return $type(obj) == 'object';\r\n}","use":{"$type":1}},"$type":{"source":"function $type(obj){\r\n    var type = typeof obj;      \r\n    if(type == 'object'){\r\n        if(obj === null ){\r\n            return 'null';\r\n        }else if(obj == $WIN || obj == obj.window){\r\n            return 'window';\r\n        }else if(obj == $DOC || obj.nodeType === 9){\r\n            return 'document';\r\n        }\r\n        type = {}.toString.call(obj).match(/\\w+(?=\\])/)[0].toLowerCase();\r\n        if(~type.indexOf('element') || type == 'object' && obj.nodeType === 1){\r\n            return 'element';\r\n        }\r\n    }\r\n    return type;\r\n}\r\n/*\r\n    alert($type(/a/));\r\n    alert($type(document.getElementsByTagName('div')[0]));\r\n    alert($type(null));\r\n    alert($type(void 0));\r\n    alert($type(new Date));\r\n    alert($type(function(){}));\r\n    alert($type([]));\r\n    alert($type(2121));\r\n    alert($type(true));\r\n    alert($type(window));\r\n    alert($type(document));\r\n*/","use":{"$WIN":1,"$DOC":1}},"$XHR":{"source":"$XHR = function(){\r\n    return $WIN.XMLHttpRequest || function(){ //ie6下使用遍历来获得最高版本的xmlhttp\r\n        var xhrProgid = [0, 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP', 'Msxml2.XMLHTTP.6.0'],\r\n            i = 4,\r\n            xhr;\r\n        while(--i){\r\n            try{\r\n                new ActiveXObject(xhr = xhrProgid[i]);\r\n                return function(){return new ActiveXObject(xhr)};\r\n            }catch(e){}\r\n        }\r\n    }();\r\n}();","use":{"$WIN":1}},"$ajax":{"source":"function $ajax(options){\r\n    var \r\n    t1 = +new Date,\r\n    xhr = new $XHR,\r\n    callback = options.callback,\r\n    headers = options.headers,\r\n    key;\r\n    xhr.open(options.type || 'get', options.url, options.async || true);\r\n    for(key in headers) { //设置发送的头\r\n        xhr.setRequestHeader(key, headers[key]);\r\n    }\r\n    xhr.onreadystatechange = function(){\r\n        xhr.readyState == 4 && callback && callback(\r\n            xhr.status == 200 \r\n            ? options.responseType \r\n                ? xhr[options.responseType] \r\n                : xhr\r\n            : null\r\n        );\r\n    };\r\n    xhr.send(options.data || null);\r\n}\r\nfunction $post(url, callback, data){ //post经典版封装\r\n    $ajax({\r\n        url: url,\r\n        type: 'post',\r\n        data: $isObject(data) ? $param(data) : data,\r\n        callback: function(responseText){\r\n            //try{\r\n                callback($parseJson(responseText));\r\n            //}catch(e){\r\n              //  callback(null);\r\n           // }\r\n        },\r\n        responseType: 'responseText',\r\n        headers: { //post必须给http头设置Content-Type\r\n            'Content-Type': 'application/x-www-form-urlencoded'\r\n        }\r\n    });\r\n}","use":{"$XHR":1,"$isObject":1,"$param":1,"$parseJson":1}},"$get":{"source":"function $get(url, callback, data){ //get经典版封装\r\n    $ajax({\r\n        url: url + (data ? '?'+ ($isObject(data) ? $param(data) : data) : ''),\r\n        callback: function(responseText){\r\n            \r\n            //try{\r\n                callback($parseJson(responseText));\r\n            //}catch(e){\r\n                //console.info(e.message);\r\n                //callback(null);\r\n            //}\r\n        },\r\n        responseType: 'responseText'\r\n    });\r\n}\r\n;;;;\r\nfunction $img(url, callback){\r\n    var img = new Image;\r\n    img.src = url;\r\n    \r\n    if(img.complete){\r\n        return done(img);\r\n    }\r\n    img.onload = function () {\r\n        done(img);\r\n    };\r\n    img.onerror = function(){\r\n        done(null);\r\n    };\r\n    function done(result){\r\n        img.onload = img.onerror = null;\r\n        callback && callback(result, result);\r\n    }\r\n    return this;\r\n}","use":{"$ajax":1,"$isObject":1,"$param":1,"$parseJson":1}},"$js":{"source":"function $js(url, callback, data, charset){\r\n    var script = $DOC.createElement('script');\r\n    data && (url += '?' + (typeof data == 'object' ? $param(data) : data));\r\n    charset && (script.charset = charset);\r\n    script.src = url;\r\n    script.readyState\r\n        ? script.onreadystatechange = function(){\r\n            /loaded|complete/.test(script.readyState) && done();\r\n        }\r\n        : script.onload = done;\r\n    $HEAD.appendChild(script);\r\n    return this;\r\n    function done(){\r\n        callback && callback();\r\n        $HEAD.removeChild(script);\r\n        script.onload = script.onreadystatechange = null;\r\n    }\r\n}","use":{"$DOC":1,"$param":1,"$HEAD":1}},"$style":{"source":"function $style(cssText){\r\n    $isArray(cssText) && (cssText = cssText.join(''));\r\n    if(/{[\\w\\W]+?}/.test(cssText)){ //cssText\r\n        var style = $DOC.createElement('style');\r\n        style.type = 'text/css';\r\n        style.styleSheet && (style.styleSheet.cssText = cssText) || style.appendChild($DOC.createTextNode(cssText));	\r\n    }else{\r\n        style = $DOC.createElement('link');\r\n        style.rel = 'stylesheet';\r\n        style.href = arg1;\r\n    }\r\n    $HEAD.appendChild(style);\r\n    return this;\r\n}","use":{"$isArray":1,"$DOC":1,"$HEAD":1}},"$jsonp2":{"source":"function $jsonp2(url, callback, charset, timeout){\r\n    var s = $DOC.createElement('script'),\r\n        callbackName = 'json' + (++$GUID),\r\n        tr = setTimeout(function(){//超时则放弃请求\r\n            $HEAD.removeChild(s);\r\n            delete $WIN[callbackName];\r\n        }, timeout || 10000);\r\n    \r\n    $WIN[callbackName] = function(result){\r\n        clearTimeout(tr);\r\n        callback(result);\r\n    };\r\n    s.src = 'http://jsonp2.1kjs.com/?' + $param({\r\n        charset: charset || 'utf-8',\r\n        callback: callbackName,\r\n        e_url: url\r\n    }, true);\r\n    charset && (s.charset = charset);\r\n    $HEAD.appendChild(s);\r\n    if(s.readyState){\r\n        s.onreadystatechange = function(){\r\n            if(s.readyState == 'loaded' || s.readyState == 'complete'){\r\n                //callback&&callback();\r\n                $HEAD.removeChild(s);\r\n            }\r\n        };\r\n    }else{\r\n        s.onload = function(){\r\n            //callback&&callback();\r\n            $HEAD.removeChild(s);\r\n        };\r\n    }\r\n    return this;\r\n}","use":{"$DOC":1,"$GUID":1,"$HEAD":1,"$WIN":1,"$param":1}},"$encodeHTML":{"source":"function $encodeHTML(str){\r\n    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\r\n}"},"$decodeHTML":{"source":"function $decodeHTML(str){\r\n    return str.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');\r\n}"},"$encodeURL":{"source":"function $encodeURL(str){\r\n    return str\r\n        .replace(/%/g, '%25')\r\n        .replace(/ /g, '%20')\r\n        .replace(/#/g, '%23')\r\n        .replace(/&/g, '%26')\r\n        .replace(/=/g, '%3D')\r\n        .replace(/\\//g, '%2F')\r\n        .replace(/\\?/g, '%3F')\r\n        .replace(/\\+/g, '%2B');\r\n}"},"$tirm":{"source":"function $tirm(str){\r\n    return str.replace(/^\\s+|\\s+$/g, '');\r\n}"},"$parseJson":{"source":"function $parseJson(str){\r\n    try{\r\n        str = $tirm(str);\r\n        if(!str.replace(/\"(?:\\\\\\\\|\\\\\\\"|[^\"])*\"|[\\s{}\\[\\]:\\d.,]+|true|false/g, '')){ //说明JSON数据符合要求\r\n            return Function('return ' + str)();\r\n        }\r\n    }catch(e){}\r\n    throw new SyntaxError('JSON.parse');\r\n}","use":{"$tirm":1}},"$Easing":{"source":"$Easing = {\r\n    Linear: function(p) {\r\n        return p;\r\n    },\r\n    slowIn: function(p) {\r\n        return p * p;\r\n    },\r\n    slowOut: function(p) {\r\n        return p * (2 - p);\r\n    },\r\n    slowBoth: function(p) {\r\n        if ((p /= 0.5) < 1) return 1 / 2 * p * p;\r\n        return -1 / 2 * ((--p) * (p - 2) - 1);\r\n    },\r\n    In: function(p) {\r\n        return p * p * p * p;\r\n    },\r\n    Out: function(p) {\r\n        return -((p -= 1) * p * p * p - 1);\r\n    },\r\n    Both: function(p) {\r\n        if ((p /= 0.5) < 1) return 1 / 2 * p * p * p * p;\r\n        return -1 / 2 * ((p -= 2) * p * p * p - 2);\r\n    },\r\n    fastIn: function(p) {\r\n        return p * p * p * p * p * p;\r\n    },\r\n    fastOut: function(p) {\r\n        return -((p -= 1) * p * p * p * p * p - 1);\r\n    },\r\n    fastBoth: function(p) {\r\n        if ((p /= 0.5) < 1) return 1 / 2 * p * p * p * p * p * p;\r\n        return -1 / 2 * ((p -= 2) * p * p * p * p * p - 2);\r\n    },\r\n    elasticIn: function(p) {\r\n        if (p == 0) return 0;\r\n        if (p == 1) return 1;\r\n        var x = 0.3,\r\n        //y = 1,\r\n        z = x / 4;\r\n        return -(Math.pow(2, 10 * (p -= 1)) * Math.sin((p - z) * (2 * Math.PI) / x));\r\n    },\r\n    elasticOut: function(p) {\r\n        if (p == 0) return 0;\r\n        if (p == 1) return 1;\r\n        var x = 0.3,\r\n        //y = 1,\r\n        z = x / 4;\r\n        return Math.pow(2, -10 * p) * Math.sin((p - z) * (2 * Math.PI) / x) + 1;\r\n    },\r\n    elasticBoth: function(p) {\r\n        if (p == 0) return 0;\r\n        if ((p /= 0.5) == 2) return 1;\r\n        var x = 0.3 * 1.5,\r\n        //y = 1,\r\n        z = x / 4;\r\n        if (p < 1) return -0.5 * (Math.pow(2, 10 * (p -= 1)) * Math.sin((p - z) * (2 * Math.PI) / x));\r\n        return Math.pow(2, -10 * (p -= 1)) * Math.sin((p - z) * (2 * Math.PI) / x) * 0.5 + 1;\r\n    },\r\n    backIn: function(p) {\r\n        var s = 1.70158;\r\n        return p * p * ((s + 1) * p - s);\r\n    },\r\n    backOut: function(p) {\r\n        var s = 1.70158;\r\n        return ((p = p - 1) * p * ((s + 1) * p + s) + 1);\r\n    },\r\n    backBoth: function(p) {\r\n        var s = 1.70158;\r\n        if ((p /= 0.5) < 1) return 1 / 2 * (p * p * (((s *= (1.525)) + 1) * p - s));\r\n        return 1 / 2 * ((p -= 2) * p * (((s *= (1.525)) + 1) * p + s) + 2);\r\n    },\r\n    bounceIn: function(p) {\r\n        return 1 - $Easing.bounceOut(1 - p);\r\n    },\r\n    bounceOut: function(p) {\r\n        if (p < (1 / 2.75)) {\r\n            return (7.5625 * p * p);\r\n        } else if (p < (2 / 2.75)) {\r\n            return (7.5625 * (p -= (1.5 / 2.75)) * p + 0.75);\r\n        } else if (p < (2.5 / 2.75)) {\r\n            return (7.5625 * (p -= (2.25 / 2.75)) * p + 0.9375);\r\n        }\r\n        return (7.5625 * (p -= (2.625 / 2.75)) * p + 0.984375);\r\n    },\r\n    bounceBoth: function(p) {\r\n        if (p < 0.5) return $Easing.bounceIn(p * 2) * 0.5;\r\n        return $Easing.bounceOut(p * 2 - 1) * 0.5 + 0.5;\r\n    }\r\n};"},"$AnimHook":{"source":"$AnimHook = {};"},"$Anim":{"source":"function $Anim(elem, attrs, options){\r\n    \r\n    var drawId;\r\n    var onstop;\r\n    play(attrs, options || {});\r\n    \r\n    return {\r\n        play: play,\r\n        stop: function(){\r\n            stop();\r\n            onstop && onstop();\r\n        }\r\n    };\r\n    \r\n    function play(attrs, options){\r\n        if(typeof options == 'number'){\r\n            options = {\r\n                dur: options\r\n            };\r\n        }\r\n        options.onbefore && options.onbefore();\r\n        onstop = options.onstop;\r\n        \r\n        var style = elem.style;\r\n        var easing = $Easing[options.easing] || $Easing.Both;\r\n        var onplay = options.onplay;\r\n        var ondone = options.ondone;\r\n        var dur = options.dur || 800;\r\n        var time0 = +new Date;\r\n        var per;\r\n        var cache_per = 0;\r\n        var attrsObj = fromatAttrs(attrs);\r\n        var attrs = attrsObj.attrs;\r\n        var from = attrsObj.from;\r\n        var by = attrsObj.by;\r\n        var fixAttrs = attrsObj.fixAttrs;\r\n        var ceil = Math.ceil;\r\n        drawId = $draw(function(){\r\n            \r\n            per = (+new Date - time0) / dur;\r\n            if(per >= 1){ //完成进度，则清除draw\r\n                per = 1;\r\n                stop();\r\n            }else{\r\n                per = ~~(easing(per) *10000)/10000; //精确保留4位小数\r\n            }\r\n            \r\n            if(cache_per != per){ //由于定时器存在精度问题，所以在下一帧中per未必发生改变\r\n                cache_per = per;\r\n                \r\n                var attr, i = 0;\r\n                while(attr = attrs[i]){\r\n                    style[attr] = ceil(from[i] + per * by[i++]) + 'px';\r\n                }\r\n                if(attr = fixAttrs.opacity){\r\n                    $opacity(elem, attr.from + per * attr.by);\r\n                }\r\n                onplay && onplay();\r\n                if(per == 1){\r\n                    ondone && ondone();\r\n                }\r\n            }\r\n            \r\n        });\r\n    }\r\n    \r\n    function fromatAttrs(attrsIn){\r\n        var attrs = [];\r\n        var from = [];\r\n        var by = [];\r\n        var fixAttrs = {};\r\n        var value; //传入参数\r\n        var fromValue; //起始位置\r\n        var byValue; //改变量\r\n        var isRelative; //是否是相对改变\r\n        \r\n        for(var attr in attrsIn){\r\n            value = attrsIn[attr];\r\n            if(typeof value != 'number'){\r\n                value = parseInt(value);\r\n            }\r\n\r\n            if(isRelative = attr.indexOf('x') == 0){\r\n                attr = attr.substr(1);\r\n                fromValue = $cssnum(elem, attr);\r\n                byValue = value;\r\n            }else{\r\n                fromValue = $cssnum(elem, attr);\r\n                byValue = value - fromValue;\r\n\r\n            }\r\n            \r\n            if(/opacity/.test(attr)){\r\n                var fromValue = $opacity(elem);\r\n                fixAttrs['opacity'] = {\r\n                    from: fromValue,\r\n                    by: isRelative ? byValue : value - fromValue\r\n                };\r\n            }else{\r\n                attrs.push(attr);\r\n                from.push(fromValue);\r\n                by.push(byValue);\r\n            }\r\n            \r\n        }\r\n        return{\r\n            attrs: attrs,\r\n            from: from,\r\n            by: by,\r\n            fixAttrs: fixAttrs\r\n        };\r\n    }\r\n\r\n    function stop(){\r\n        $draw.clear(drawId);\r\n    }\r\n\r\n}","use":{"$Easing":1,"$draw":1,"$opacity":1,"$cssnum":1}},"$draw":{"source":"function $draw(fn, hook){\r\n    var list = [], //函数列表\r\n        ids = {}, //hooks\r\n        tr, //定时器句柄\r\n        fpsClick = [], //帧打点\r\n        info = { //监控数据\r\n            execTime: 0,\r\n            list: [],\r\n            fps: 0\r\n        };\r\n        \r\n    $draw = draw;\r\n    draw.clear = clear;\r\n    draw.info = getInfo;\r\n    \r\n    return draw(fn, hook);\r\n    \r\n    function draw(fn, hook){\r\n        clear(hook);\r\n        \r\n        var id = ++$GUID;\r\n        ids[id] = 1;\r\n        list.push({\r\n            id: id,\r\n            fn: fn\r\n        });\r\n        if(list.length == 1){\r\n            start();\r\n        }\r\n        return id;\r\n    }\r\n    \r\n    function clear(hook){\r\n        if(ids[hook]){\r\n            delete ids[hook];\r\n            var item, i = 0;\r\n            while(item = list[i++]){\r\n                if(item.id == hook){\r\n                    list.splice(i-1, 1);\r\n                    break;\r\n                }\r\n            }\r\n\r\n            if(list.length == 0){\r\n                stop();\r\n            }\r\n        }\r\n    }\r\n    \r\n    function start(){\r\n\r\n        function fns(){\r\n\r\n            for(var i = 0, lg = list.length; i < lg; i++){\r\n                var item = list[i]; //由于在item.fn中可能会执行clear操作，所以list[i]可能已经不存在了\r\n                item && item.fn();\r\n            }\r\n            \r\n        }\r\n        function run(){\r\n            var t0 = +new Date;\r\n            fns();\r\n            var t1 = +new Date;\r\n            \r\n            //取15ms是因为ie浏览器16ms精度问题,基本上达到60fps，差不多需要40fps+动画才能流畅\r\n            //t1 - t0 为程序执行时间，进行相应的修正\r\n            tr = setTimeout(run, Math.max(0, 15 - (t1 - t0)));                       \r\n            return;\r\n            var fpsItem, i = 0;\r\n            while(fpsItem = fpsClick[i++]){ //更新帧数\r\n                if(t1 - fpsItem < 1000){ //清除已经过期的打点\r\n                    break;\r\n                }\r\n                fpsClick.shift();\r\n            }\r\n            \r\n            fpsClick.push(t1);\r\n            info.execTime = t1 - t0;\r\n            info.fps = fpsClick.length;\r\n            info.list = list;\r\n        }\r\n        \r\n        run();\r\n    }\r\n    \r\n    function stop(){\r\n        clearTimeout(tr);\r\n    }\r\n    \r\n    function getInfo(){\r\n        return info;\r\n    }\r\n}\r\n$draw.clear = $noop;","use":{"$GUID":1,"$noop":1}},"$DragHook":{"source":"$DragHook = {};"},"$Drag":{"source":"$Drag = $Class.extend({\r\n    init: function(elem, options){\r\n        this.elem = elem;\r\n        this.time = 0;\r\n        var config = {\r\n            before: 0,//拖动前\r\n            after: 0,//拖动完成\r\n            runing: 0,//拖动中\r\n            clone: 0,//是否clone节点\r\n            lockx: 0,//锁定x方向\r\n            locky: 0,//锁定y方向\r\n            range: -1//拖动范围控制\r\n        };\r\n        \r\n        for(var ex in config){\r\n            this['_'+ ex] = (ex in options ? options : config)[ex];\r\n        }\r\n\r\n        this.addHand(options.hand || elem);\r\n        \r\n    },\r\n    \r\n    addHand: function(hand){\r\n        $bind(hand, 'mousedown', this._beforeDrag, this);\r\n    },\r\n    \r\n    rmvHand: function(hand){\r\n        $bind(hand, 'mousedown', this._beforeDrag, this);\r\n    },\r\n    _init: function(evt){\r\n        this._hasInit = 1;\r\n        var elem = this.elem, box = elem,\r\n            offset = $offset(elem),\r\n            marginLeft = $cssnum(elem, 'marginLeft'),\r\n            marginTop = $cssnum(elem, 'marginTop');\r\n        \r\n        if(this._clone){\r\n            var clone = $clone(elem, true);\r\n            $css(clone, {\r\n                position: 'absolute',\r\n                zIndex: 9999,\r\n                left: offset.left - marginLeft,\r\n                top: offset.top - marginTop,\r\n                width: $cssnum(elem, 'width'),\r\n                height: $cssnum(elem, 'height')\r\n            });\r\n            $append($DOC.body, clone);\r\n            box = this._clone = clone;\r\n        }\r\n        this._style = box.style;\r\n        \r\n        this._offsetX = evt.clientX - box.offsetLeft + marginLeft;\r\n        this._offsetY = evt.clientY - box.offsetTop + marginTop;\r\n        this._before && this._before.call(this, evt);\r\n        if(this._range == -1){//限制在窗口内\r\n            this._minX = 0;\r\n            this._minY = 0;\r\n            this._maxX = $DE.clientWidth - box.offsetWidth - marginLeft - $cssnum(box, 'marginRight');\r\n            this._maxY = $DE.clientHeight - box.offsetHeight - marginTop - $cssnum(box, 'marginBottom');\r\n        }else if(this._range){\r\n            var range = $query(this._range),\r\n                ro = $offset(range),\r\n                rw = range.offsetWidth,\r\n                rh = range.offsetHeight,\r\n                bl = $cssnum(range, 'borderLeftWidth'),\r\n                br = $cssnum(range, 'borderRightWidth'),\r\n                bt = $cssnum(range, 'borderTopWidth'),\r\n                bb = $cssnum(range, 'borderBottomWidth');\r\n            this._minX = ro.left + bl;\r\n            this._minY = ro.top + bt;\r\n            this._maxX = ro.left + rw - br - box.offsetWidth - marginLeft - $cssnum(box, 'marginRight');\r\n            this._maxY = ro.top + rh - bb - box.offsetHeight - marginTop- $cssnum(box, 'marginBottom');\r\n            \r\n            \r\n        }\r\n        \r\n    },\r\n    \r\n    _beforeDrag: function(evt){\r\n        if(evt.mouseKey != 'L' || (this._lockx && this._locky)){\r\n            return;\r\n        }\r\n        \r\n        evt.stopPropagation();\r\n        evt.preventDefault();\r\n        this._hasInit = 0;\r\n        \r\n        if($browser.ie){\r\n            this._focusHand = evt.target;\r\n            $bind(this._focusHand, 'losecapture', this._drop, this);\r\n            this._focusHand.setCapture(false);\r\n        }else{\r\n            $bind($WIN, 'blur', this._drop, this);\r\n        }\r\n        \r\n        $bind($DOC, 'mousemove', this._draging, this);\r\n        $bind($DOC, 'mouseup', this._drop, this);\r\n    },\r\n    \r\n    _draging: function(evt){\r\n        \r\n        ///*进行过滤\r\n        var now = +new Date;\r\n        if(now - this.time > 15){\r\n            this.time = now;\r\n        }else{\r\n            return;\r\n        }\r\n        //*/\r\n\r\n        $WIN.getSelection ? $WIN.getSelection().removeAllRanges() : $DOC.selection.empty();\r\n        !this._hasInit && this._init(evt);\r\n        \r\n        var left = evt.clientX - this._offsetX,\r\n            top = evt.clientY - this._offsetY;\r\n        if(this._range){\r\n\r\n            left = Math.max(this._minX, Math.min(left, this._maxX));\r\n            top = Math.max(this._minY, Math.min(top, this._maxY));\r\n        }\r\n        \r\n        !this._lockx && (this._style.left = left +'px');\r\n        !this._locky && (this._style.top = top +'px');\r\n        this._runing && this._runing.call(this, evt);\r\n    },\r\n    _drop:function(evt){\r\n        $unbind($DOC, 'mousemove', this._draging, this);\r\n        $unbind($DOC, 'mouseup', this._drop, this);\r\n        \r\n        if($browser.ie){\r\n            $unbind(this._focusHand, 'losecapture', this._drop, this);\r\n            this._focusHand.releaseCapture();\r\n        }else{\r\n            $unbind($WIN, 'blur', this._drop, this);\r\n        }\r\n        this._after && this._after.call(this, evt);\r\n        if(this._clone && this._clone.parentNode){\r\n            $remove(this._clone);\r\n        }\r\n        \r\n    },\r\n    set: function(options){\r\n        for(var e in options){\r\n            this[e] = options[e];\r\n        }  \r\n    },\r\n    lock: function(){\r\n        this._lockx = true;\r\n        this._locky = true;\r\n    },\r\n    unlock: function(){\r\n        this._lockx = false;\r\n        this._locky = false;\r\n    }\r\n    \r\n\r\n});","use":{"$Class":1,"$bind":1,"$offset":1,"$cssnum":1,"$clone":1,"$css":1,"$append":1,"$DOC":1,"$DE":1,"$query":1,"$browser":1,"$WIN":1,"$unbind":1,"$remove":1}},"$anim":{"source":"function $anim(elem, cssAttr, callback){\r\n    \r\n    var \r\n    property,\r\n    cssAttrCache = {};\r\n    \r\n    for(property in cssAttr){\r\n        cssAttrCache[property] = $cssnum(elem, property);\r\n    }\r\n    if(cssAttr.opacity > -1){\r\n        cssAttr.opacity = Math.round(cssAttr.opacity * 100);\r\n        cssAttrCache.opacity = Math.round(cssAttrCache.opacity * 100);\r\n    }\r\n    clearInterval(elem._animTimer_);\r\n    elem._animTimer_ = setInterval(function(){\r\n        var\r\n        complete = 1,\r\n        property,\r\n        speed;\r\n        for(property in cssAttr){\r\n            if(cssAttr[property] != cssAttrCache[property]){\r\n                complete = 0;\r\n                speed = (cssAttr[property] - cssAttrCache[property]) / 8;\r\n                cssAttrCache[property] += speed > 0 ? Math.ceil(speed) : Math.floor(speed);\r\n                $css(elem, property, property == 'opacity' ? cssAttrCache[property] / 100 : cssAttrCache[property]);\r\n            }\r\n        }\r\n        if(complete){\r\n            clearInterval(elem._animTimer_);\r\n            callback && callback();\r\n        }\r\n    }, 15);\r\n    \r\n}","use":{"$cssnum":1,"$css":1}}};
+		var Hash = API2Hash(API);
+		var useAPI = {};
+		var unUseAPI = deepCopy(API);
+		return{
+			showAPI: showAPI,
+			setEvent: function(){
+				J('#unuseapi').click(function(e){
+					change(J(e.target), 'add');
+				});
+				J('#useapi').click(function(e){
+					change(J(e.target), 'remove');
+				});
+				J('#pkgall').click(function(){
+					unUseAPI = {};
+					useAPI = deepCopy(API);
+					showAPI();
+				});
+				J('#clearall').click(function(){
+					unUseAPI = deepCopy(API);
+					useAPI = {};
+					showAPI();
+				});
+				J('#pkgdiy').click(function(){
+					
+					var jscode = getCodeByUse(API2Hash(useAPI));
+					var doc = open('', '_blank');
+					doc.document.write('<!doctype html><html><head><meta charset="utf-8"/><title>1k</title><script src="/1k.js"></'+'script><script src="/doc/highlight.js?skin=default"></'+'script><script>$1k.highlight.init()</'+'script></head><body><textarea class="lang-js">'+ jscode +'</textarea></body></html>');
+					doc.document.close();
+				});
+				
+			}
+			
+		};
+		function showAPI(){
+			J('#unuseapi').html(APIhtml(unUseAPI));
+			J('#useapi').html(APIhtml(useAPI));
+			
+		}
+		function APIhtml(api){
+			if(typeof api=='object'){
+				var ht = [];
+				$each(api, function(val, key){
+					var jid = key;
+					if(typeof val.valueOf() == 'object'){
+						key='<li jid="'+ jid +'"><h3>'+ key +'</h3>'+ APIhtml(val) +'</li>';
+					}else{
+						key = key.split('_');
+						key = ({
+							s: 'J.'+ key[0],
+							p: 'J(~).'+ key[0]
+						})[key[1]];
+						key = '<li class="item" jid="'+ jid +'">'+ key +'</li>';
+					}
+					ht.push(key);
+				});
+				return '<ul>'+ ht.join('') +'</ul>';
+			}
+			return '';
+			
+		}
+		function deepCopy(obj){//ȿ
+			var _obj = {};
+			if(typeof obj == 'object'){
+				for(var key in obj){
+					_obj[key] = deepCopy(obj[key]);
+				}
+				return _obj;
+			}
+			return obj;
+		}
+		function change(btn, type){
+			if(btn.cls('item')){
+				var ApiKey = btn.attr('jid'),
+					ApiPath = [], //ӦĽӿ·
+					end;
+				while((btn = btn.parent(1)) && btn.tag('LI')){
+					ApiPath.unshift(btn.attr('jid'));
+				}
+				var unuse = unUseAPI,
+					use = useAPI,
+					key,
+					i = 0;
+				
+				if(type == 'add'){
+					while(key = ApiPath[i++]){ //һĶȡApi
+						unuse = unuse[key];
+						use = !use[key] ? (use[key] = {}) : use[key];
+					}
+					use[ApiKey] = unuse[ApiKey];
+					delete unuse[ApiKey];
+				}else{
+					while(key = ApiPath[i++]){
+						use = use[key];
+						unuse = !unuse[key] ? (unuse[key] = {}) : unuse[key];
+					}
+					unuse[ApiKey] = use[ApiKey];
+					delete use[ApiKey];
+				}
+				showAPI();
+			}
+		}
+		function API2Hash(api, hash){ //תAPiΪkey:valueʽ
+			hash = hash || {};
+			$each(api, function(val, key){
+				if(typeof val == 'object'){
+					API2Hash(val, hash);
+				}else{
+					hash[key] = val;
+				}
+			});
+			return hash;
+		}
+		function getCodeByUse(useQueue){
+			var apiCode = [],
+				imports = {},//Ѿapi־
+				iptVars = {},//Ѿı
+				iptFuns = {},//Ѿĺ
+				selCode = 0;//Ƿʹѡ
+			$each(useQueue, function(val, key){
+				key = key.split('_');
+				if(key[0]){//ɶӿڵĴ룬sΪ̬pΪԭ
+					apiCode.push(({
+						s: '\t$1k.'+ key[0] +' = '+ val,
+						p: '\t$DP.'+ key[0] +' = '+ clearBlank(val)
+					})[key[1]] + ';');
+					if(key[1] == 'p'){
+						selCode = 1;
+					}
+				}
+			});
+			function clearBlank(fn){//ǰ׺հסʵֶ
+				fn = ''+ fn;
+				var blank;
+				fn.replace(/^\t+/gm, function(all){
+					if(!blank || all.length < blank.length){
+						blank = all;
+					}
+				});
+				return fn.replace(new RegExp('^\\' + blank, 'gm'), '\t');
+				
+			}
+			apiCode = apiCode.join('\n') + '\n';
+			if(!selCode){
+				imports['$1k'] = 1;
+				apiCode = '\tfunction $1k(){}\n'+ apiCode;
+			}
+			$each(useQueue, function(val, key){ //ΪʲôڵһeachɣҪΪselCodeȫܵóս
+				parseCode(val);
+			});
+			if(selCode && !imports['$1k']){ //δ$1k
+				apiCode = '\t'+ CODE['$1k'].source + '\n\t'+ CODE['$Dom'].source +'\n'+ apiCode;
+			}
+			var vars = [],
+				funs = [];
+			for(var key in CODE){ //Ϊ˱ָAPI˳
+				if(key in iptVars){
+					vars.push(iptVars[key].replace(/;(\s*|\/\/.*)$/, '')); //ȥβķֺźͿհ
+				}else if(key in iptFuns){
+					funs.push(iptFuns[key]);
+				}
+			}
+			if(vars.length){
+				vars[0] = vars[0].replace(/^\s*/, '');
+				vars = '\tvar '+vars.join(',\n') + ';\n';
+			}else{
+				vars = '';
+			}
+			return header + '\n'
+			+ '!function(){\n'
+			+ vars + funs.join('') + apiCode
+			+ '\tthis.$1k = $1k;\n'
+			+ '}();\n';
+			
+			function parseCode(code){
+				(code +'').replace(/\$[\w]+/g, function(key){
+					if(key in CODE && !(key in imports)){//APIвһδ
+						imports[key] = 1;
+						if(/^\s*function\s*/.test(CODE[key].source)){//ǺǱ
+							iptFuns[key] = ('\t'+ CODE[key].source +'\n');
+						}else{
+							iptVars[key] = ('\t'+ CODE[key].source +'\n');
+						}
+						parseCode(CODE[key].source);
+					}
+				});
+			}
+		}
+	}();
+	
+	Lib.showAPI();
+	Lib.setEvent();
+	
+}($1k);
+    $1k('iframe', top.document).height($1k.scrollHeight());
+</script>
+</body>
+</html>

@@ -11,7 +11,7 @@ function getCode(){
     code = {};
     
     
-    Fs.eachFiles($mappath('../code'), { //遍历解析code
+    Fs.eachFiles($mappath('/src/code'), { //遍历解析code
         matchFile: /\.js$/,
         skipFile: /\.res\.js$/
     }, function(file){
