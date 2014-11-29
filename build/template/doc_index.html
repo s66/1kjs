@@ -1,0 +1,43 @@
+<!doctype html>
+<meta charset="utf-8"/>
+<link href="doc.css" rel="stylesheet"/>
+<script src="/js/1k.js"></script>
+<table class="wrap" cellspacing="0" cellpadding="0">
+    <tr>
+        <td id="sidebar">{$sidebar}</td>
+        <td id="content"><iframe width="100%" src="about.html"></iframe></td>
+    </tr>
+</table>
+
+<script>
+var focusButton;
+var focusButton2;
+Z('#sidebar h4').click(function(){
+    if(focusButton && focusButton.elem != this.elem){
+        focusButton.next().cls('-show');   
+    }
+    this.next().cls('~show');
+    focusButton = this;
+});
+Z('#sidebar h5').click(function(){
+    if(focusButton2 && focusButton2.elem != this.elem){
+        focusButton2.next().cls('-show');
+    }
+    this.next().cls('~show');
+    focusButton2 = this;
+});
+var iframe = Z('iframe');
+//var iDoc = iframe.elem.contentWindow.document;
+Z('#sidebar').click(function(e){
+    var idx = Z(e.target).attr('idx');
+    if(idx){
+        iframe.attr('src', 'page/'+ idx +'.html');
+        Z.scrollTop(0, 300);
+    }
+
+});
+
+iframe.on('load', function(){
+    iframe.attr('height', Math.max(640, Z('body', iframe.elem.contentWindow.document).height()))
+});
+</script>

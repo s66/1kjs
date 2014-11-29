@@ -1,0 +1,60 @@
+<?
+var DOC_menu = [];    
+
+$each($DOC, function(data, mod){
+    
+    DOC_menu.push('<li class="mod">');
+    DOC_menu.push('<h4>'+ data._text +'</h4>');
+    DOC_menu.push('<div>');
+    if(data._items){
+        readItem(mod, data, 1);
+    }else{
+        $each(data, function(info, mod){
+            readItem(mod, info);
+        });
+    }
+    DOC_menu.push('</div>');
+    DOC_menu.push('</li>');
+    function readItem(mod, data, root){
+        if(!data._items)return;
+        if(root){
+            DOC_menu.push('<ul class="rootitem">');
+        }else{
+            DOC_menu.push('<h5>'+ data._text +'</h5>');
+            DOC_menu.push('<ul class="item">');
+        }
+        $mod = mod;
+        $each(data._items, function(info, i){
+            
+            $name = info.name.replace(/\((.+)?\)/, '( <span>$1</span> )');
+            $type = info.type == '#' ? '<span class="type prototype">原型方法</span>' : '';
+            $desc = info.desc;
+            $params = info.params;
+            $more = info.more;
+            $ret = info.ret ? info.ret.match(/^(\S+) (.+)$/) : null;
+            var name = info.name.split(' ')[0];
+            DOC_menu.push('<li idx="'+ name.split('(')[0] +'">'+ name.split('(')[0] +'</li>');
+            Fs.writeText($mappath('../../doc/page/'+ name.split('(')[0] +'.html'), Zero.getContent($mappath('../template.res/doc_page.html'), 936));
+        });  
+        DOC_menu.push('</ul>');
+    }
+    
+});
+
+
+$sidebar = '<h1><a href="">1K.JS</a></h1><ul>'+ DOC_menu.join('') +'</ul>';
+
+//$push('<script>DOC_menu='+JSON.stringify(DOC_menu)+'</script>'); 
+
+var doc_index = Zero.getContent($mappath('../template.res/doc_index.html'), 936);
+//$push(doc_index);  
+Fs.writeText(
+    $mappath('../../doc/index.html'),
+    doc_index
+);
+Fs.writeText(
+    $mappath('../../doc/about.html'),
+    Zero.getContent($mappath('../template.res/doc_about.html'), 936)
+);
+ 
+?>

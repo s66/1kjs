@@ -1,0 +1,47 @@
+<!doctype html>
+<meta charset="utf-8"/>
+<style>
+<?$inc('/css/base.css')?>
+html{overflow:hidden;}
+body,ul{margin:0;padding:0;}
+ul{list-style:none;}
+
+#pkbox{font-size:14px;margin-bottom:8px}
+#pkbox ul{margin-left:1em;}
+#pkbox ul .item{background:#232529;border:1px solid #000;text-indent:6px;margin:2px;cursor:pointer;color:#ddd;_display:inline-block;}
+#pkbox ul .item:hover{background:#3e4043;color:#fed16a;}
+.ppapi{float:left;margin-right:16px;width:200px;border:1px solid #3C78B5;padding:4px;}
+.ppapi h3{text-indent:6px;}
+body {font-family:tahoma,arial,宋体,sans-serif!important;}
+.info{padding:1em;font-size:14px;background:#ddd;margin:16px 0;}
+h1{font-size:24px;margin-bottom:12px;}
+.doc{margin:40px;}
+</style>
+<body>
+    <div class="doc">
+        <p class="info">1kjs是一个简洁小巧，可自由定制的JS类库。</p>
+        <h1>1k类库打包</h1>
+        <div id="pkbox" class="clearfix">
+            <div class="ppapi">
+                <h3>类库未选API</h3>
+                <ul id="unuseapi"></ul>
+            </div>
+            <div class="ppapi">
+                <h3>类库已选API</h3>
+                <ul id="useapi"></ul>
+            </div>
+            <ul class="ppapi">
+                <li><button id="pkgall">选择全部</button></li>
+                <li><button id="clearall">清空选择</button></li>
+                <li><button id="pkgdiy">查看定制</button></li>
+            </ul>
+        </div>    
+    </div>
+<script src="/js/1k.js"></script>
+
+<script>
+    <?$inc('../appjs/build_lib.client.js');?>
+    $1k('iframe', top.document).height($1k.scrollHeight());
+</script>
+</body>
+</html>
