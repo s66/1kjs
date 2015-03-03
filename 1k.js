@@ -1444,7 +1444,7 @@ $1k = function(){
     function $parseJson(str){
         try{
             str = $tirm(str);
-            if(!str.replace(/"(?:\\\\|\\\"|[^"])*"|[\s{}\[\]:\d.,]+|true|false/g, '')){ //说明JSON数据符合要求
+            if(!str.replace(/"(?:\\\\|\\\"|[^"])*"|[\s{}\[\]:\d.,-]+|true|false|null|undefined/g, '')){ //说明JSON数据符合要求
                 return Function('return ' + str)();
             }
         }catch(e){}
