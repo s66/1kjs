@@ -67,3 +67,20 @@ function $remove(node){
     node.parentNode.removeChild(node);
     return this;
 }
+;;;;;
+function $insert(node, newNode, flag){
+    newNode = $elem(newNode);
+    if(flag){
+        while(node.nextSibling){
+            node = node.nextSibling;
+            if(node.nodeType == 1){
+                node.parentNode.insertBefore(newNode, node);
+                return this;
+            }
+        }
+        node.parentNode.appendChild(newNode);
+    }else{
+        node.parentNode.insertBefore(newNode, node);
+    }
+    return this;
+}

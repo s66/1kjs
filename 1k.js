@@ -497,7 +497,7 @@ $1k = function(){
                     ? evt.stopPropagation() 
                     : (evt.cancelBubble = true);
             },
-            mouseKey: ($browser.ie ? {1: 'L', 4: 'M', 2: 'R'} : {0: 'L', 1: 'M', 2: 'R'})[evt.button],
+            mouseKey: ($browser.ie < 9 ? {1: 'L', 4: 'M', 2: 'R'} : {0: 'L', 1: 'M', 2: 'R'})[evt.button],
             preventDefault: function(){
                 evt.preventDefault 
                     ? evt.preventDefault()
@@ -778,6 +778,22 @@ $1k = function(){
     }
     function $remove(node){
         node.parentNode.removeChild(node);
+        return this;
+    }
+    function $insert(node, newNode, flag){
+        newNode = $elem(newNode);
+        if(flag){
+            while(node.nextSibling){
+                node = node.nextSibling;
+                if(node.nodeType == 1){
+                    node.parentNode.insertBefore(newNode, node);
+                    return this;
+                }
+            }
+            node.parentNode.appendChild(newNode);
+        }else{
+            node.parentNode.insertBefore(newNode, node);
+        }
         return this;
     }
     function $attr(node, name, value){
