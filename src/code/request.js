@@ -157,3 +157,38 @@ function $jsonp2(url, callback, charset, timeout){
     }
     return this;
 }
+;;;;;
+function $jsonp3(url, callback, charset, timeout){
+    var s = $DOC.createElement('script'),
+        callbackName = 'json' + (++$GUID),
+        tr = setTimeout(function(){//超时则放弃请求
+            $HEAD.removeChild(s);
+            delete $WIN[callbackName];
+        }, timeout || 10000);
+    
+    $WIN[callbackName] = function(result){
+        clearTimeout(tr);
+        callback(result);
+    };
+    s.src = 'http://jsonp66.sinaapp.com/?' + $param({
+        charset: charset || 'utf-8',
+        callback: callbackName,
+        e_url: url
+    }, true);
+    charset && (s.charset = charset);
+    $HEAD.appendChild(s);
+    if(s.readyState){
+        s.onreadystatechange = function(){
+            if(s.readyState == 'loaded' || s.readyState == 'complete'){
+                //callback&&callback();
+                $HEAD.removeChild(s);
+            }
+        };
+    }else{
+        s.onload = function(){
+            //callback&&callback();
+            $HEAD.removeChild(s);
+        };
+    }
+    return this;
+}

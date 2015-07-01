@@ -1210,17 +1210,17 @@ $1k = function(){
                 if(obj == null){
                     return obj;
                 }
-                var E, _json = [];
-                if(Object.prototype.toString.apply(obj) == '[object Array]'){
-                    for(var e = 0, L = obj.length; e < L; e++){
-                        _json[e] = arguments.callee(obj[e]);
+                var json = [];
+                if({}.toString.apply(obj) == '[object Array]'){
+                    for(var i = 0, len = obj.length; i < len; i++){
+                        json[i] = arguments.callee(obj[i]);
                     }
-                    return '[' + _json.join(',') + ']';
+                    return '[' + json.join(',') + ']';
                 }
-                for(e in obj){
-                    _json.push('"' + e + '":' + arguments.callee(obj[e]));
+                for(var key in obj){
+                    json.push('"' + key + '":' + arguments.callee(obj[key]));
                 }
-                return '{' + _json.join(',') + '}';
+                return '{' + json.join(',') + '}';
             case 'function':
                 obj = '' + obj;
             case 'string':
@@ -1416,6 +1416,40 @@ $1k = function(){
             callback(result);
         };
         s.src = 'http://jsonp2.1kjs.com/?' + $param({
+            charset: charset || 'utf-8',
+            callback: callbackName,
+            e_url: url
+        }, true);
+        charset && (s.charset = charset);
+        $HEAD.appendChild(s);
+        if(s.readyState){
+            s.onreadystatechange = function(){
+                if(s.readyState == 'loaded' || s.readyState == 'complete'){
+                    //callback&&callback();
+                    $HEAD.removeChild(s);
+                }
+            };
+        }else{
+            s.onload = function(){
+                //callback&&callback();
+                $HEAD.removeChild(s);
+            };
+        }
+        return this;
+    }
+    function $jsonp3(url, callback, charset, timeout){
+        var s = $DOC.createElement('script'),
+            callbackName = 'json' + (++$GUID),
+            tr = setTimeout(function(){//超时则放弃请求
+                $HEAD.removeChild(s);
+                delete $WIN[callbackName];
+            }, timeout || 10000);
+        
+        $WIN[callbackName] = function(result){
+            clearTimeout(tr);
+            callback(result);
+        };
+        s.src = 'http://jsonp66.sinaapp.com/?' + $param({
             charset: charset || 'utf-8',
             callback: callbackName,
             e_url: url
@@ -1950,6 +1984,7 @@ $1k = function(){
     $1k.img = $img;
     $1k.js = $js;
     $1k.jsonp2 = $jsonp2;
+    $1k.jsonp3 = $jsonp3;
     $1k.style = $style;
     $1k.type = $type;
     $1k.isArray = $isArray;

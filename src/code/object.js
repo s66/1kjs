@@ -21,17 +21,17 @@ function $toJson(obj){
             if(obj == null){
                 return obj;
             }
-            var E, _json = [];
-            if(Object.prototype.toString.apply(obj) == '[object Array]'){
-                for(var e = 0, L = obj.length; e < L; e++){
-                    _json[e] = arguments.callee(obj[e]);
+            var json = [];
+            if({}.toString.apply(obj) == '[object Array]'){
+                for(var i = 0, len = obj.length; i < len; i++){
+                    json[i] = arguments.callee(obj[i]);
                 }
-                return '[' + _json.join(',') + ']';
+                return '[' + json.join(',') + ']';
             }
-            for(e in obj){
-                _json.push('"' + e + '":' + arguments.callee(obj[e]));
+            for(var key in obj){
+                json.push('"' + key + '":' + arguments.callee(obj[key]));
             }
-            return '{' + _json.join(',') + '}';
+            return '{' + json.join(',') + '}';
         case 'function':
             obj = '' + obj;
         case 'string':

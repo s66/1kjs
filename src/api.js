@@ -743,6 +743,7 @@
          */
         js_s: '$js',
         jsonp2_s: '$jsonp2',
+        jsonp3_s: '$jsonp3',
         /**
             @syntax style(url|csstext) 加载css文件或者csstext
             @params
